@@ -1,4 +1,5 @@
 <template>
+  <!-- 修复容器布局，确保占满整个视口 -->
   <div id="app" class="flex flex-col h-screen bg-gray-50 dark:bg-gray-800">
     <!-- 顶部导航栏 -->
     <header class="bg-white dark:bg-gray-700 shadow-sm py-3 px-4 flex items-center justify-between">
@@ -19,8 +20,8 @@
       </div>
     </header>
 
-    <!-- 聊天内容区域 -->
-    <main class="flex-1 overflow-y-auto p-4 space-y-6" ref="chatContainer" :class="{ 'bg-gray-800': darkMode }">
+    <!-- 主要内容区域 -->
+    <main class="flex-1 min-h-0 overflow-y-auto p-4 space-y-6" ref="chatContainer" :class="{ 'bg-gray-800': darkMode }">
       <div v-for="(message, index) in messages" :key="index" class="max-w-3xl mx-auto">
         <div :class="['flex', message.role === 'user' ? 'justify-end' : 'justify-start']">
           <div :class="['flex items-start space-x-3', message.role === 'user' ? 'flex-row-reverse space-x-reverse' : '']">
@@ -52,7 +53,7 @@
       </div>
     </main>
 
-    <!-- 输入框区域 -->
+    <!-- 底部输入区域 -->
     <footer :class="['border-t p-4', darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200']">
       <div class="max-w-3xl mx-auto relative">
         <div class="flex items-center flex-wrap gap-2">
@@ -398,4 +399,26 @@ watch(messages, scrollToBottom, {deep: true})
 
 <style scoped>
 /* 这里可以放一些组件特有的样式 */
+/* 添加暗黑模式过渡动画 */
+.dark-transition {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 优化滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
 </style>

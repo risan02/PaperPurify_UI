@@ -1,4 +1,7 @@
 import { createApp } from 'vue'
+import App from './App.vue'
+// 添加 Tailwind CSS 全局样式
+import './index.css'
 
 import Cookies from 'js-cookie'
 
@@ -9,7 +12,6 @@ import locale from 'element-plus/es/locale/lang/zh-cn'
 
 import '@/assets/styles/index.scss' // global css
 
-import App from './App'
 import store from './store'
 import router from './router'
 import directive from './directive' // directive
