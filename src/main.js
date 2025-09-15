@@ -43,6 +43,9 @@ import ImageUpload from "@/components/ImageUpload"
 import ImagePreview from "@/components/ImagePreview"
 // 字典标签组件
 import DictTag from '@/components/DictTag'
+import '@fortawesome/fontawesome-free/css/all.min.css'
+// 引入全局样式文件，确保 Tailwind 和自定义样式生效
+import '@/assets/styles/main.css'
 
 const app = createApp(App)
 

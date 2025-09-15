@@ -52,6 +52,19 @@ export const constantRoutes = [
     component: () => import('@/views/error/404'),
     hidden: true
   },
+
+  {
+    path: '/chat-analysis',
+    component: () => import('@/views/chat-analysis/index'), // 确保路径指向您新创建的组件
+    name: 'ChatAnalysis',
+    meta: {
+      title: '志望理由分析顾问',
+      // 由于此页面独立显示，以下meta属性可根据需要设置，但非必须
+      icon: 'chat',
+      noCache: true // 通常此类页面不希望缓存
+    },
+    hidden: true // 确保不在若依的侧边栏菜单中显示
+  },
   {
     path: '/401',
     component: () => import('@/views/error/401'),
