@@ -7,7 +7,7 @@ import request from '@/utils/request'
  * @returns {Promise<Response>} - 原始Response对象，用于流式读取
  */
 export function sendChatMessage(formData, signal) {
-    // 注意：若依的 request 可能基于axios，默认不支持流式响应。
+    // 注意：晴天号的 request 可能基于axios，默认不支持流式响应。
     // 这里使用原生fetch API来实现流式响应
     return fetch('/chat', {
         method: 'POST',
@@ -21,11 +21,11 @@ export function sendChatMessage(formData, signal) {
 }
 
 /**
- * 获取当前用户token（示例方法，需根据若依实际实现调整）
+ * 获取当前用户token（示例方法，需根据晴天号实际实现调整）
  * @returns {string} token
  */
 function getToken() {
-    // 若依通常将token存储在localStorage或cookie中，例如：
+    // 晴天号通常将token存储在localStorage或cookie中，例如：
     return localStorage.getItem('token') || ''
 }
 

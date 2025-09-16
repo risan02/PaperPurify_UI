@@ -76,7 +76,7 @@ export const constantRoutes = [
       icon: 'chat',
       noCache: true // 通常此类页面不希望缓存
     },
-    hidden: true // 确保不在若依的侧边栏菜单中显示
+    hidden: true // 确保不在晴天号的侧边栏菜单中显示
   },
   {
     path: '/401',

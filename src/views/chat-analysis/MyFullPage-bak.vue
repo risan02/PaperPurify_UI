@@ -2,7 +2,7 @@
   <div class="my-full-page">
     <!-- 你的全屏页面内容 -->
     <h1>这是我的全屏应用</h1>
-    <p>所有若依的布局元素都已隐藏。</p>
+    <p>所有晴天号的布局元素都已隐藏。</p>
     <!-- 你可以在这里自由构建你的应用界面 -->
   </div>
 </template>
@@ -13,9 +13,9 @@ import { useStore } from 'vuex'
 
 const store = useStore()
 
-// 进入页面时隐藏若依的布局元素
+// 进入页面时隐藏晴天号的布局元素
 onMounted(() => {
-  // 隐藏侧边栏 (根据若依的Vuex状态管理方式)
+  // 隐藏侧边栏 (根据晴天号的Vuex状态管理方式)
   store.dispatch('app/toggleSideBarHide', true) // 隐藏侧边栏
   store.dispatch('app/toggleDevice', 'mobile') // 强制切换到移动端布局（侧边栏会自动隐藏）
 
@@ -33,7 +33,7 @@ onMounted(() => {
   if (tagsView) tagsView.style.display = 'none'
 })
 
-// 如果可能会离开此页面回到若依其他页面，可以在离开时恢复显示
+// 如果可能会离开此页面回到晴天号其他页面，可以在离开时恢复显示
 onUnmounted(() => {
   // 恢复显示布局元素
   store.dispatch('app/toggleSideBarHide', false)
