@@ -1,5 +1,4 @@
 <template>
-  <!-- 修复容器布局，确保占满整个视口 -->
   <div id="app" class="flex flex-col h-screen bg-gray-50 dark:bg-gray-800">
     <!-- 顶部导航栏 -->
     <header class="bg-white dark:bg-gray-700 shadow-sm py-3 px-4 flex items-center justify-between">

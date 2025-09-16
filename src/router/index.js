@@ -52,7 +52,20 @@ export const constantRoutes = [
     component: () => import('@/views/error/404'),
     hidden: true
   },
-
+  {
+    path: '/my-full-page',
+    component: () => import('@/views/chat-analysis/MyFullPage'),
+    name: 'MyFullPage',
+    meta: {
+      title: '我的全屏页面',
+      hidden: true // 这个设置可防止此路由在布局中显示
+    }
+  },
+  {
+    path: '/chatgpt',
+    name: 'ChatGPT',
+    component: () => import('@/views/chat-analysis/chatgpt.vue')
+  },
   {
     path: '/chat-analysis',
     component: () => import('@/views/chat-analysis/index'), // 确保路径指向您新创建的组件
