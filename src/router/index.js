@@ -39,9 +39,22 @@ export const constantRoutes = [
   },
   {
     path: '/login',
-    component: () => import('@/views/login'),
-    hidden: true
+    component: () => import('@/layout/SimpleLayout'),
+    hidden: true,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/newlogin/index'),
+        name: 'Login',
+        meta: { title: '登录' }
+      }
+    ]
   },
+  // {
+  //   path: '/login',
+  //   component: () => import('@/views/login'),
+  //   hidden: true
+  // },
   {
     path: '/register',
     component: () => import('@/views/register'),
