@@ -127,8 +127,8 @@ function handleLogin() {
           return acc
         }, {})
         // router.push('/chat-analysis')
-        router.push('my-full-page')
-
+        // router.push('my-full-page')
+        router.push('/ai-analysis')
       }).catch(() => {
         loading.value = false
         // 重新获取验证码
