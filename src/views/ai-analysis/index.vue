@@ -283,8 +283,8 @@ const initChart = () => {
         show: false
       },
       data: [
-        { value: mockAnalysisResult.aiScore },
-        { value: 100 - mockAnalysisResult.aiScore, itemStyle: { color: '#f0f0f0' } }
+        { value: analysisResult.value.aiScore },
+        { value: 100 - analysisResult.value.aiScore, itemStyle: { color: '#f0f0f0' } }
       ]
     }]
   }
@@ -296,10 +296,10 @@ const initChart = () => {
   const animationDuration = 1500
   const animationFrame = 16
   const totalFrames = animationDuration / animationFrame
-  const valueIncrement = mockAnalysisResult.aiScore / totalFrames
+  const valueIncrement = analysisResult.value.aiScore / totalFrames
 
   const animateChart = () => {
-    if (currentValue < mockAnalysisResult.aiScore) {
+    if (currentValue < analysisResult.value.aiScore) {
       currentValue += valueIncrement
       option.series[0].data[0].value = currentValue
       option.series[0].data[1].value = 100 - currentValue
@@ -318,7 +318,7 @@ const initRadarChart = () => {
   radarChartInstance = echarts.init(radarChart.value)
   const option = {
     radar: {
-      indicator: mockAnalysisResult.qualityDimensions.map(d => ({
+      indicator: analysisResult.value.qualityDimensions.map(d => ({
         name: d.name,
         max: 100
       })),
@@ -347,7 +347,7 @@ const initRadarChart = () => {
     series: [{
       type: 'radar',
       data: [{
-        value: mockAnalysisResult.qualityDimensions.map(d => d.score),
+        value: analysisResult.value.qualityDimensions.map(d => d.score),
         name: '評価スコア',
         areaStyle: {
           color: 'rgba(24, 144, 255, 0.6)'
