@@ -181,10 +181,12 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from 'element-plus'
 import { Plus, Document, Close, Loading, ArrowDown } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import request from '@/utils/request'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 
 // 用户信息
 const user = ref({
@@ -457,12 +459,6 @@ const switchToRecommendations = () => {
   resultPage.value = 'recommendations'
 }
 
-// 下载报告
-const downloadReport = () => {
-  ElMessage.success('レポートのダウンロードを開始します')
-  // 这里实现实际的下载逻辑
-}
-
 // 退出登录
 const handleLogout = () => {
   // 调用退出登录接口
@@ -503,6 +499,70 @@ const probabilityClass = computed(() => {
   if (analysisResult.value.aiScore >= 40) return 'medium-probability'
   return 'low-probability'
 })
+
+// 下载报告,导出PDF
+const downloadReport = async () => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'PDFを生成中...',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+
+  try {
+    // 创建PDF实例
+    const pdf = new jsPDF('p', 'mm', 'a4')
+
+    // 获取三个结果页面的DOM元素
+    const resultSections = [
+      document.querySelector('.result-section'),
+      document.querySelector('.dimensions-section'),
+      document.querySelector('.recommendations-section')
+    ]
+
+    // 依次处理每个部分
+    for (let i = 0; i < resultSections.length; i++) {
+      const section = resultSections[i]
+      if (!section) continue
+
+      // 将HTML内容转换为canvas
+      const canvas = await html2canvas(section, {
+        scale: 2, // 提高分辨率
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      })
+
+      // 将canvas转换为图像数据
+      const imgData = canvas.toDataURL('image/png', 1.0)
+
+      // 获取PDF页面尺寸
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+
+      // 计算图像在PDF中的尺寸
+      const imgWidth = pdfWidth
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width
+
+      // 添加新页面（除了第一页）
+      if (i > 0) {
+        pdf.addPage()
+      }
+
+      // 添加图像到PDF
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+    }
+
+    // 保存PDF文件
+    pdf.save('PaperPurify_分析レポート.pdf')
+
+    ElMessage.success('PDFのエクスポートが完了しました')
+  } catch (error) {
+    console.error('PDF导出错误:', error)
+    ElMessage.error('PDFのエクスポート中にエラーが発生しました: ' + error.message)
+  } finally {
+    loading.close()
+  }
+}
 
 // 组件挂载和卸载
 onMounted(() => {
@@ -990,5 +1050,26 @@ const router = useRouter()
 
 .recommendations-text p:last-child {
   margin-bottom: 0;
+}
+
+/* 确保所有结果页面在导出时显示正确 */
+.result-section,
+.dimensions-section,
+.recommendations-section {
+  box-sizing: border-box;
+  background-color: white;
+}
+
+/* 优化PDF导出时的样式 */
+@media print {
+  .top-section,
+  .button-container {
+    display: none !important;
+  }
+
+  .main-content {
+    padding: 0;
+    margin: 0;
+  }
 }
 </style>
