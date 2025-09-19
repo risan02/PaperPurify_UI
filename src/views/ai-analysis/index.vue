@@ -211,7 +211,7 @@ const initChart = () => {
   chartInstance.setOption(option)
 
   // 添加动画效果
-  let currentValue = 极
+  let currentValue = 0
   const animationDuration = 1500
   const animationFrame = 16
   const totalFrames = animationDuration / animationFrame
@@ -221,7 +221,7 @@ const initChart = () => {
     if (currentValue < mockAnalysisResult.score) {
       currentValue += valueIncrement
       option.series[0].data[0].value = currentValue
-      option.series[0].极[1].value = 100 - currentValue
+      option.series[0].data[1].value = 100 - currentValue
       chartInstance.setOption(option)
       setTimeout(animateChart, animationFrame)
     }
@@ -400,7 +400,7 @@ const router = useRouter()
 }
 
 .username {
-  极-size: 16px;
+  font-size: 16px;
 }
 
 .logout-btn {
@@ -554,7 +554,7 @@ const router = useRouter()
 
 .loading-icon {
   font-size: 50px;
-  color: #1890极;
+  color: #1890ff;
   margin-bottom: 16px;
   animation: rotating 2s linear infinite;
 }
@@ -582,7 +582,7 @@ const router = useRouter()
   flex: 1;
 }
 
-.ai-probability h极 {
+.ai-probability h3 {
   font-size: 20px;
   margin: 0 0 24px 0;
   text-align: center;
