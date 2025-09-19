@@ -3,8 +3,7 @@
     <!-- 顶部黑色导航区域 -->
     <div class="top-section">
       <div class="top-left">
-        <h1>論文のAI成分を浄化し、学術を初心に戻す</h1>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <h1>PaperPurify</h1>
       </div>
       <div class="top-right">
         <div class="user-info">
@@ -38,9 +37,10 @@
         </div>
 
         <el-button
-            class="continue-btn"
-            :disabled="!uploadedFile"
-            @click="startAnalysis"
+          class="continue-btn"
+          :disabled="!uploadedFile"
+          @click="startAnalysis"
+          style="margin: 0 auto; display: block;"
         >
           继续
         </el-button>
@@ -68,7 +68,7 @@
         </div>
 
         <el-button class="continue-btn" @click="startAnalysis">
-          继续
+          继続
         </el-button>
       </div>
 
