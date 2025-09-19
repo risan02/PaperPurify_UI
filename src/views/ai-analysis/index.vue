@@ -96,37 +96,38 @@
 
     <!-- 分析完成状态 - 页面1: AI生成可能性 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'probability'" class="result-section">
-      <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-      <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <div class="result-content">
+          <div class="ai-probability">
+            <!-- 将可能性文本放在饼图上方 -->
+            <h3>本文AI生成の可能性: <span :class="probabilityClass">{{ aiProbabilityText }}</span></h3>
+            <div class="probability-chart">
+              <div class="chart-container">
+                <div class="chart" ref="chart"></div>
+                <span class="chart-value">{{ analysisResult.aiScore }}%</span>
+              </div>
+            </div>
+          </div>
 
-      <div class="result-content">
-        <div class="ai-probability">
-          <h3>本文AI生成の可能性: <span :class="probabilityClass">{{ aiProbabilityText }}</span></h3>
-          <div class="probability-chart">
-            <div class="chart-container">
-              <div class="chart" ref="chart"></div>
-              <span class="chart-value">{{ analysisResult.aiScore }}%</span>
+          <div class="dimension-scores">
+            <div class="dimension" v-for="(dimension, index) in analysisResult.aiDimensions" :key="index">
+              <div class="dimension-header">
+                <h4>{{ dimension.name }}</h4>
+                <!-- 将色块放在维度标题右边 -->
+                <div class="score-level" :class="dimension.level">
+                  {{ dimension.level }}
+                </div>
+              </div>
+              <p class="evaluation">{{ dimension.evaluation }}</p>
             </div>
           </div>
         </div>
 
-        <div class="dimension-scores">
-          <div class="dimension" v-for="(dimension, index) in analysisResult.aiDimensions" :key="index">
-            <h4>{{ dimension.name }}</h4>
-            <div class="score-level" :class="dimension.level">
-              {{ dimension.level }}
-            </div>
-            <p class="evaluation">{{ dimension.evaluation }}</p>
-          </div>
+        <div class="button-container">
+          <el-button class="continue-btn" @click="switchToDimensions">
+            生成具体评价
+          </el-button>
         </div>
       </div>
-
-      <div class="button-container">
-        <el-button class="continue-btn" @click="switchToDimensions">
-          生成具体评价
-        </el-button>
-      </div>
-    </div>
 
     <!-- 分析完成状态 - 页面2: 详细评价 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'dimensions'" class="dimensions-section">
@@ -232,7 +233,7 @@ const mockAnalysisResult = {
     },
     {
       name: '学部専門との適合度',
-      score: 75,
+      score: 72,
       evaluation: '選択した専門分野との関連性はありますが、より深い関連性を示す具体例が必要です。'
     },
     {
@@ -242,7 +243,7 @@ const mockAnalysisResult = {
     },
     {
       name: '文章構造と論理展開',
-      score: 80,
+      score: 82,
       evaluation: '文章構造は整っていますが、段落間のつながりや論理の流れに改善の余地があります。'
     },
     {
@@ -252,7 +253,7 @@ const mockAnalysisResult = {
     },
     {
       name: '文法と日本語の正確性',
-      score: 95,
+      score: 98,
       evaluation: '文法は正確で、日本語表現も自然です。ただし、一部の表現がやや硬い印象です。'
     }
   ],
@@ -276,7 +277,7 @@ const initChart = () => {
       radius: ['70%', '90%'],
       avoidLabelOverlap: false,
       itemStyle: {
-        color: '#1890ff'
+        color: '#f56c6c' // 红色表示高AI生成可能性
       },
       label: {
         show: false
@@ -747,6 +748,9 @@ const router = useRouter()
 
 .ai-probability {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .ai-probability h3 {
@@ -804,6 +808,14 @@ const router = useRouter()
   border-radius: 8px;
   padding: 16px;
   background-color: #f9f9f9;
+  width: 100%; /* 加长维度说明块的宽度 */
+}
+
+.dimension-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .dimension h4 {
@@ -879,30 +891,21 @@ const router = useRouter()
   margin-bottom: 40px;
 }
 
-.quality-dimension {
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #f9f9f9;
-}
-
-.quality-dimension h4 {
+/* 继续按钮 */
+.continue-btn {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 12px;
   font-size: 16px;
-  margin: 0 0 8px 0;
+  font-weight: 500;
 }
 
-.score-value {
-  display: block;
-  text-align: right;
-  font-size: 14px;
-  margin-top: 4px;
-  font-weight: bold;
-}
-
-.dimension-evaluation {
-  font-size: 14px;
-  margin: 8px 0 0 0;
-  line-height: 1.6;
+.continue-btn:disabled {
+  background-color: #d9d9d9;
+  color: #999;
+  cursor: not-allowed;
 }
 
 /* 结果区域 - 页面3: 修改建议 */
