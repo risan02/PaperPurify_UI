@@ -68,12 +68,12 @@
           </div>
         </div>
 
-        <div class="button-container">
-          <el-button class="continue-btn" @click="startAnalysis">
-            继续
-          </el-button>
-        </div>
+      <div class="button-container">
+        <el-button class="continue-btn" @click="startAnalysis">
+          继续
+        </el-button>
       </div>
+    </div>
 
       <!-- 分析中状态 -->
       <div v-if="pageState === 'analyzing'" class="analyzing-section">
@@ -92,59 +92,89 @@
             確認して続行
           </el-button>
         </div>
+    </div>
+
+    <!-- 分析完成状态 - 页面1: AI生成可能性 -->
+    <div v-if="pageState === 'analysisComplete' && resultPage === 'probability'" class="result-section">
+      <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
+      <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+
+      <div class="result-content">
+        <div class="ai-probability">
+          <h3>本文AI生成の可能性: <span :class="probabilityClass">{{ aiProbabilityText }}</span></h3>
+          <div class="probability-chart">
+            <div class="chart-container">
+              <div class="chart" ref="chart"></div>
+              <span class="chart-value">{{ analysisResult.aiScore }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dimension-scores">
+          <div class="dimension" v-for="(dimension, index) in analysisResult.aiDimensions" :key="index">
+            <h4>{{ dimension.name }}</h4>
+            <div class="score-level" :class="dimension.level">
+              {{ dimension.level }}
+            </div>
+            <p class="evaluation">{{ dimension.evaluation }}</p>
+          </div>
+        </div>
       </div>
 
-      <!-- 分析完成状态 -->
-      <div v-if="pageState === 'analysisComplete'" class="result-section">
-        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
-
-        <div class="result-content">
-          <div class="ai-probability">
-            <h3>本文AI生成の可能性: <span :class="probabilityClass">{{ aiProbabilityText }}</span></h3>
-            <div class="probability-chart">
-              <div class="chart-container">
-                <div class="chart" ref="chart"></div>
-                <span class="chart-value">{{ analysisResult.score }}%</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="dimension-scores">
-            <div class="dimension">
-              <h4>論理的整合性</h4>
-              <el-progress :percentage="analysisResult.dimensions.logic" :color="getScoreColor(analysisResult.dimensions.logic)" />
-              <span class="score-label">{{ getScoreLabel(analysisResult.dimensions.logic) }}</span>
-            </div>
-            <div class="dimension">
-              <h4>表現の自然さ</h4>
-              <el-progress :percentage="analysisResult.dimensions.expression" :color="getScoreColor(analysisResult.dimensions.expression)" />
-              <span class="score-label">{{ getScoreLabel(analysisResult.dimensions.expression) }}</span>
-            </div>
-            <div class="dimension">
-              <h4>内容の独自性</h4>
-              <el-progress :percentage="analysisResult.dimensions.originality" :color="getScoreColor(analysisResult.dimensions.originality)" />
-              <span class="score-label">{{ getScoreLabel(analysisResult.dimensions.originality) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="recommendations">
-          <h4>改善提案:</h4>
-          <ul>
-            <li v-for="(recommendation, index) in analysisResult.recommendations" :key="index">
-              {{ recommendation }}
-            </li>
-          </ul>
-        </div>
-
-        <div class="button-container">
-          <el-button class="continue-btn" @click="downloadReport">
-            レポートをダウンロード
-          </el-button>
-        </div>
+      <div class="button-container">
+        <el-button class="continue-btn" @click="switchToDimensions">
+          生成具体评价
+        </el-button>
       </div>
     </div>
+
+    <!-- 分析完成状态 - 页面2: 详细评价 -->
+    <div v-if="pageState === 'analysisComplete' && resultPage === 'dimensions'" class="dimensions-section">
+      <h2>詳細評価</h2>
+      <p>論文の質を6つの次元で評価しました</p>
+
+      <div class="radar-chart-container">
+        <div class="radar-chart" ref="radarChart"></div>
+      </div>
+
+      <div class="quality-dimensions">
+        <div class="quality-dimension" v-for="(dimension, index) in analysisResult.qualityDimensions" :key="index">
+          <h4>{{ dimension.name }}</h4>
+          <el-progress :percentage="dimension.score" :color="getQualityScoreColor(dimension.score)" />
+          <span class="score-value">{{ dimension.score }}/100</span>
+          <p class="dimension-evaluation">{{ dimension.evaluation }}</p>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <el-button class="continue-btn scroll-btn" @click="switchToRecommendations">
+          <el-icon><ArrowDown /></el-icon>
+          下滑展示更多
+        </el-button>
+      </div>
+    </div>
+
+    <!-- 分析完成状态 - 页面3: 修改建议 -->
+    <div v-if="pageState === 'analysisComplete' && resultPage === 'recommendations'" class="recommendations-section">
+      <h2>修改建议</h2>
+      <p>AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供し、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。</p>
+
+      <div class="recommendations-content">
+        <h4>改善提案:</h4>
+        <div class="recommendations-text">
+          <p v-for="(recommendation, index) in analysisResult.recommendations" :key="index">
+            {{ recommendation }}
+          </p>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <el-button class="continue-btn" @click="downloadReport">
+          PDFをエクスポート
+        </el-button>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -152,7 +182,7 @@
 import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Plus, Document, Close, Loading } from '@element-plus/icons-vue'
+import { Plus, Document, Close, Loading, ArrowDown } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 
 // 用户信息
@@ -161,31 +191,80 @@ const user = ref({
   avatar: ''
 })
 
-// 页面状态管理: initial, fileUploaded, analyzing, analysisComplete
+// 页面状态管理
 const pageState = ref('initial')
+const resultPage = ref('probability') // probability, dimensions, recommendations
 const uploadedFile = ref(null)
 const fileInput = ref(null)
 const analysisResult = ref({})
 const chart = ref(null)
+const radarChart = ref(null)
 let chartInstance = null
+let radarChartInstance = null
 
 // 模拟分析结果
 const mockAnalysisResult = {
-  score: 75,
-  probability: 'high', // low, medium, high
-  dimensions: {
-    logic: 65,
-    expression: 80,
-    originality: 70
-  },
+  aiScore: 75,
+  aiProbability: 'high', // low, medium, high
+  aiDimensions: [
+    {
+      name: '言語的困惑度',
+      level: '高',
+      evaluation: '専門用語が使われているにもかかわらず、文章の構造があまりにも整然としていて、自然な流暢さに欠けている。'
+    },
+    {
+      name: '構造とテンプレート使用傾向',
+      level: '中',
+      evaluation: '抽象的な定義から入り、論理展開が非常に典型的で、独自性に欠ける。'
+    },
+    {
+      name: '専門用語密度と論理的一貫性',
+      level: '高',
+      evaluation: '「第一性原理的思考」「制度設計」「政策立案型エコノミスト」など高度な専門用語が一貫して使用されているが、論理展開にやや無理がある。'
+    }
+  ],
+  qualityDimensions: [
+    {
+      name: '志望動機の明確性と具体性',
+      score: 88,
+      evaluation: '志望動機は明確で具体的ですが、より個人的な経験や具体例を追加すると説得力が増します。'
+    },
+    {
+      name: '学部専門との適合度',
+      score: 75,
+      evaluation: '選択した専門分野との関連性はありますが、より深い関連性を示す具体例が必要です。'
+    },
+    {
+      name: '学習計画の合理性',
+      score: 68,
+      evaluation: '学習計画は基本的に合理的ですが、時間配分と具体的な実施方法についてより詳細な記述が必要です。'
+    },
+    {
+      name: '文章構造と論理展開',
+      score: 80,
+      evaluation: '文章構造は整っていますが、段落間のつながりや論理の流れに改善の余地があります。'
+    },
+    {
+      name: '表現力と説得力',
+      score: 92,
+      evaluation: '言語表現が流暢で、学術用語が正確で、文体が美しく、かなりの可読性があります。'
+    },
+    {
+      name: '文法と日本語の正確性',
+      score: 95,
+      evaluation: '文法は正確で、日本語表現も自然です。ただし、一部の表現がやや硬い印象です。'
+    }
+  ],
   recommendations: [
     '結論部分の論理展開に一貫性が不足しています。具体例を追加して説明を補強してください。',
     '専門用語の使用がやや過剰です。読み手の理解度に合わせて平易な表現に置き換えることを検討してください。',
-    '独自の考察部分をさらに拡充し、既存研究との差異を明確に示すとより説得力が増します。'
+    '独自の考察部分をさらに拡充し、既存研究との差異を明確に示すとより説得力が増します。',
+    '第2-4段落の表現方法を見直し、より自然な流れになるように調整してください。',
+    '結論部分の論理的一貫性を強化し、論文全体の主張を明確にまとめてください。'
   ]
 }
 
-// 初始化图表
+// 初始化饼图
 const initChart = () => {
   if (!chart.value) return
 
@@ -202,8 +281,8 @@ const initChart = () => {
         show: false
       },
       data: [
-        { value: mockAnalysisResult.score },
-        { value: 100 - mockAnalysisResult.score, itemStyle: { color: '#f0f0f0' } }
+        { value: mockAnalysisResult.aiScore },
+        { value: 100 - mockAnalysisResult.aiScore, itemStyle: { color: '#f0f0f0' } }
       ]
     }]
   }
@@ -215,10 +294,10 @@ const initChart = () => {
   const animationDuration = 1500
   const animationFrame = 16
   const totalFrames = animationDuration / animationFrame
-  const valueIncrement = mockAnalysisResult.score / totalFrames
+  const valueIncrement = mockAnalysisResult.aiScore / totalFrames
 
   const animateChart = () => {
-    if (currentValue < mockAnalysisResult.score) {
+    if (currentValue < mockAnalysisResult.aiScore) {
       currentValue += valueIncrement
       option.series[0].data[0].value = currentValue
       option.series[0].data[1].value = 100 - currentValue
@@ -228,6 +307,60 @@ const initChart = () => {
   }
 
   animateChart()
+}
+
+// 初始化雷达图
+const initRadarChart = () => {
+  if (!radarChart.value) return
+
+  radarChartInstance = echarts.init(radarChart.value)
+  const option = {
+    radar: {
+      indicator: mockAnalysisResult.qualityDimensions.map(d => ({
+        name: d.name,
+        max: 100
+      })),
+      shape: 'circle',
+      splitNumber: 4,
+      axisName: {
+        color: '#333'
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'rgba(0, 0, 0, 0.1)'
+        }
+      },
+      splitArea: {
+        show: true,
+        areaStyle: {
+          color: ['rgba(0, 0, 0, 0.03)', 'rgba(0, 0, 0, 0.05)']
+        }
+      },
+      axisLine: {
+        lineStyle: {
+          color: 'rgba(0, 0, 0, 0.2)'
+        }
+      }
+    },
+    series: [{
+      type: 'radar',
+      data: [{
+        value: mockAnalysisResult.qualityDimensions.map(d => d.score),
+        name: '評価スコア',
+        areaStyle: {
+          color: 'rgba(24, 144, 255, 0.6)'
+        },
+        lineStyle: {
+          color: 'rgba(24, 144, 255, 1)'
+        },
+        itemStyle: {
+          color: 'rgba(24, 144, 255, 1)'
+        }
+      }]
+    }]
+  }
+
+  radarChartInstance.setOption(option)
 }
 
 // 触发文件选择
@@ -297,6 +430,7 @@ const startAnalysis = async () => {
     // 模拟延迟，让用户看到加载效果
     setTimeout(() => {
       pageState.value = 'analysisComplete'
+      resultPage.value = 'probability'
       nextTick(() => {
         initChart()
       })
@@ -306,6 +440,19 @@ const startAnalysis = async () => {
     ElMessage.error('分析中にエラーが発生しました: ' + error.message)
     pageState.value = 'fileUploaded'
   }
+}
+
+// 切换到维度评价页面
+const switchToDimensions = () => {
+  resultPage.value = 'dimensions'
+  nextTick(() => {
+    initRadarChart()
+  })
+}
+
+// 切换到建议页面
+const switchToRecommendations = () => {
+  resultPage.value = 'recommendations'
 }
 
 // 下载报告
@@ -335,16 +482,23 @@ const getScoreColor = (score) => {
   return '#67c23a' // 绿色表示低风险
 }
 
+// 根据质量分数获取颜色
+const getQualityScoreColor = (score) => {
+  if (score >= 85) return '#67c23a' // 绿色表示高质量
+  if (score >= 70) return '#e6a23c' // 黄色表示中等质量
+  return '#f56c6c' // 红色表示低质量
+}
+
 // 计算AI可能性文本和样式
 const aiProbabilityText = computed(() => {
-  if (analysisResult.value.score >= 70) return '高い'
-  if (analysisResult.value.score >= 40) return '中'
+  if (analysisResult.value.aiScore >= 70) return '高い'
+  if (analysisResult.value.aiScore >= 40) return '中'
   return '低い'
 })
 
 const probabilityClass = computed(() => {
-  if (analysisResult.value.score >= 70) return 'high-probability'
-  if (analysisResult.value.score >= 40) return 'medium-probability'
+  if (analysisResult.value.aiScore >= 70) return 'high-probability'
+  if (analysisResult.value.aiScore >= 40) return 'medium-probability'
   return 'low-probability'
 })
 
@@ -357,6 +511,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (chartInstance) {
     chartInstance.dispose()
+  }
+  if (radarChartInstance) {
+    radarChartInstance.dispose()
   }
 })
 
@@ -469,7 +626,7 @@ const router = useRouter()
   font-size: 14px;
 }
 
-/* 文件预览区域 - 与上传区域大小一致 */
+/* 文件预览区域 */
 .file-preview {
   width: 600px;
   height: 240px;
@@ -512,7 +669,7 @@ const router = useRouter()
   color: #999;
 }
 
-/* 按钮容器 - 确保按钮居中 */
+/* 按钮容器 */
 .button-container {
   width: 100%;
   display: flex;
@@ -534,6 +691,14 @@ const router = useRouter()
   background-color: #d9d9d9;
   color: #999;
   cursor: not-allowed;
+}
+
+.scroll-btn {
+  background-color: #1890ff;
+}
+
+.scroll-btn:hover {
+  background-color: #40a9ff;
 }
 
 /* 分析中区域 */
@@ -570,7 +735,7 @@ const router = useRouter()
   color: #666;
 }
 
-/* 结果区域 */
+/* 结果区域 - 页面1: AI生成可能性 */
 .result-content {
   width: 800px;
   display: flex;
@@ -632,36 +797,154 @@ const router = useRouter()
   gap: 20px;
 }
 
+.dimension {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
 .dimension h4 {
   font-size: 16px;
   margin: 0 0 8px 0;
 }
 
-.score-label {
+.score-level {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.score-level.高 {
+  background-color: #f56c6c;
+  color: #fff;
+}
+
+.score-level.中 {
+  background-color: #e6a23c;
+  color: #fff;
+}
+
+.score-level.低 {
+  background-color: #67c23a;
+  color: #fff;
+}
+
+.evaluation {
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 结果区域 - 页面2: 详细评价 */
+.dimensions-section {
+  width: 100%;
+}
+
+.dimensions-section h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+.dimensions-section > p {
+  font-size: 16px;
+  text-align: center;
+  margin: 0 0 40px 0;
+  color: #666;
+}
+
+.radar-chart-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.radar-chart {
+  width: 600px;
+  height: 400px;
+}
+
+.quality-dimensions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.quality-dimension {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+.quality-dimension h4 {
+  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
+.score-value {
   display: block;
   text-align: right;
   font-size: 14px;
   margin-top: 4px;
+  font-weight: bold;
 }
 
-.recommendations {
+.dimension-evaluation {
+  font-size: 14px;
+  margin: 8px 0 0 0;
+  line-height: 1.6;
+}
+
+/* 结果区域 - 页面3: 修改建议 */
+.recommendations-section {
   width: 800px;
+}
+
+.recommendations-section h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+.recommendations-section > p {
+  font-size: 16px;
+  text-align: center;
+  margin: 0 0 40px 0;
+  color: #666;
+}
+
+.recommendations-content {
   margin-bottom: 40px;
 }
 
-.recommendations h4 {
+.recommendations-content h4 {
   font-size: 18px;
   margin: 0 0 16px 0;
 }
 
-.recommendations ul {
-  margin: 0;
-  padding-left: 20px;
+.recommendations-text {
+  background-color: #f9f9f9;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 20px;
 }
 
-.recommendations li {
-  margin-bottom: 8px;
+.recommendations-text p {
   font-size: 14px;
   line-height: 1.6;
+  margin: 0 0 12px 0;
+}
+
+.recommendations-text p:last-child {
+  margin-bottom: 0;
 }
 </style>
