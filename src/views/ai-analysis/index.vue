@@ -677,6 +677,7 @@ const router = useRouter()
   width: 100%;
   display: flex;
   justify-content: center;
+  margin-top: 10px;
 }
 
 /* 继续按钮 */
@@ -685,8 +686,8 @@ const router = useRouter()
   color: #fff;
   border: none;
   border-radius: 20px;
-  padding: 12px 40px;
-  font-size: 16px;
+  padding: 10px 30px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -856,19 +857,20 @@ const router = useRouter()
 /* 结果区域 - 页面2: 详细评价 */
 .dimensions-section {
   width: 100%;
+  padding: 20px 20px;
 }
 
 .dimensions-section h2 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: bold;
   text-align: center;
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
 }
 
 .dimensions-section > p {
-  font-size: 16px;
+  font-size: 14px;
   text-align: center;
-  margin: 0 0 40px 0;
+  margin: 0 0 20px 0;
   color: #666;
 }
 
@@ -876,19 +878,42 @@ const router = useRouter()
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .radar-chart {
-  width: 600px;
-  height: 400px;
+  width: 500px;
+  height: 320px;
 }
 
 .quality-dimensions {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.quality-dimension {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #f9f9f9;
+}
+
+.quality-dimension h4 {
+  font-size: 14px;
+  margin: 0 0 6px 0;
+}
+.score-value {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  margin-top: 2px;
+  font-weight: bold;
+}
+.dimension-evaluation {
+  font-size: 12px; /* 减小评价字体大小 */
+  margin: 6px 0 0 0; /* 调整间距 */
+  line-height: 1.5; /* 调整行高 */
 }
 
 /* 继续按钮 */
