@@ -25,7 +25,7 @@
           <div class="upload-placeholder">
             <el-icon :size="50"><Plus /></el-icon>
             <p>ファイルを追加するには、クリックするかドラッグ＆ドロップしてください</p>
-            <span>PDF、WORDなどの形式のファイルをサポートしています。</span>
+            <span>PDF、DOCX形式のファイルをサポートしています。</span>
           </div>
           <input
               ref="fileInput"
@@ -36,14 +36,15 @@
           />
         </div>
 
-        <el-button
-          class="continue-btn"
-          :disabled="!uploadedFile"
-          @click="startAnalysis"
-          style="margin: 0 auto; display: block;"
-        >
-          继续
-        </el-button>
+        <div class="button-container">
+          <el-button
+              class="continue-btn"
+              :disabled="!uploadedFile"
+              @click="startAnalysis"
+          >
+            继续
+          </el-button>
+        </div>
       </div>
 
       <!-- 文件已上传状态 -->
@@ -67,9 +68,11 @@
           </div>
         </div>
 
-        <el-button class="continue-btn" @click="startAnalysis">
-          继続
-        </el-button>
+        <div class="button-container">
+          <el-button class="continue-btn" @click="startAnalysis">
+            继续
+          </el-button>
+        </div>
       </div>
 
       <!-- 分析中状态 -->
@@ -84,9 +87,11 @@
           </div>
         </div>
 
-        <el-button class="continue-btn" disabled>
-          確認して続行
-        </el-button>
+        <div class="button-container">
+          <el-button class="continue-btn" disabled>
+            確認して続行
+          </el-button>
+        </div>
       </div>
 
       <!-- 分析完成状态 -->
@@ -133,16 +138,18 @@
           </ul>
         </div>
 
-        <el-button class="continue-btn" @click="downloadReport">
-          レポートをダウンロード
-        </el-button>
+        <div class="button-container">
+          <el-button class="continue-btn" @click="downloadReport">
+            レポートをダウンロード
+          </el-button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Plus, Document, Close, Loading } from '@element-plus/icons-vue'
@@ -204,7 +211,7 @@ const initChart = () => {
   chartInstance.setOption(option)
 
   // 添加动画效果
-  let currentValue = 0
+  let currentValue = 极
   const animationDuration = 1500
   const animationFrame = 16
   const totalFrames = animationDuration / animationFrame
@@ -214,7 +221,7 @@ const initChart = () => {
     if (currentValue < mockAnalysisResult.score) {
       currentValue += valueIncrement
       option.series[0].data[0].value = currentValue
-      option.series[0].data[1].value = 100 - currentValue
+      option.series[0].极[1].value = 100 - currentValue
       chartInstance.setOption(option)
       setTimeout(animateChart, animationFrame)
     }
@@ -236,7 +243,7 @@ const handleFileUpload = (event) => {
   // 检查文件类型
   const fileType = file.name.split('.').pop().toLowerCase()
   if (fileType !== 'pdf' && fileType !== 'docx') {
-    ElMessage.error('PDFまたはWord形式のファイルのみ対応しています')
+    ElMessage.error('PDFまたはDOCX形式のファイルのみ対応しています')
     return
   }
 
@@ -393,7 +400,7 @@ const router = useRouter()
 }
 
 .username {
-  font-size: 16px;
+  极-size: 16px;
 }
 
 .logout-btn {
@@ -462,13 +469,19 @@ const router = useRouter()
   font-size: 14px;
 }
 
-/* 文件预览 */
+/* 文件预览区域 - 与上传区域大小一致 */
 .file-preview {
   width: 600px;
+  height: 240px;
   margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .file-card {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   padding: 16px;
@@ -489,11 +502,38 @@ const router = useRouter()
 .file-info h4 {
   margin: 0 0 4px 0;
   font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .file-info span {
   font-size: 14px;
   color: #999;
+}
+
+/* 按钮容器 - 确保按钮居中 */
+.button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* 继续按钮 */
+.continue-btn {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 40px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.continue-btn:disabled {
+  background-color: #d9d9d9;
+  color: #999;
+  cursor: not-allowed;
 }
 
 /* 分析中区域 */
@@ -514,7 +554,7 @@ const router = useRouter()
 
 .loading-icon {
   font-size: 50px;
-  color: #1890ff;
+  color: #1890极;
   margin-bottom: 16px;
   animation: rotating 2s linear infinite;
 }
@@ -542,7 +582,7 @@ const router = useRouter()
   flex: 1;
 }
 
-.ai-probability h3 {
+.ai-probability h极 {
   font-size: 20px;
   margin: 0 0 24px 0;
   text-align: center;
@@ -623,22 +663,5 @@ const router = useRouter()
   margin-bottom: 8px;
   font-size: 14px;
   line-height: 1.6;
-}
-
-/* 继续按钮 */
-.continue-btn {
-  background-color: #000;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 12px 40px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.continue-btn:disabled {
-  background-color: #d9d9d9;
-  color: #999;
-  cursor: not-allowed;
 }
 </style>
