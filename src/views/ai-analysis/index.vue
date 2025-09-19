@@ -161,7 +161,6 @@
       <p>AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供し、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。</p>
 
       <div class="recommendations-content">
-        <h4>改善提案:</h4>
         <div class="recommendations-text">
           <p v-for="(recommendation, index) in analysisResult.recommendations" :key="index">
             {{ recommendation }}
@@ -686,9 +685,10 @@ const router = useRouter()
   color: #fff;
   border: none;
   border-radius: 20px;
-  padding: 10px 30px;
-  font-size: 14px;
+  padding: 12px 40px;
+  font-size: 16px;
   font-weight: 500;
+  margin-top: 20px;
 }
 
 .continue-btn:disabled {
@@ -809,7 +809,7 @@ const router = useRouter()
   border-radius: 8px;
   padding: 16px;
   background-color: #f9f9f9;
-  width: 100%; /* 加长维度说明块的宽度 */
+  width: 100%;
 }
 
 .dimension-header {
@@ -911,9 +911,9 @@ const router = useRouter()
   font-weight: bold;
 }
 .dimension-evaluation {
-  font-size: 12px; /* 减小评价字体大小 */
-  margin: 6px 0 0 0; /* 调整间距 */
-  line-height: 1.5; /* 调整行高 */
+  font-size: 12px;
+  margin: 6px 0 0 0;
+  line-height: 1.5;
 }
 
 /* 继续按钮 */
@@ -935,7 +935,9 @@ const router = useRouter()
 
 /* 结果区域 - 页面3: 修改建议 */
 .recommendations-section {
-  width: 800px;
+  width: 900px;
+  max-width: 90%;
+  margin: 0 auto;
 }
 
 .recommendations-section h2 {
@@ -948,30 +950,42 @@ const router = useRouter()
 .recommendations-section > p {
   font-size: 16px;
   text-align: center;
-  margin: 0 0 40px 0;
+  margin: 0 0 30px 0;
   color: #666;
+  line-height: 1.6;
+}
+.recommendations-section .button-container {
+  margin-top: 40px;
+  padding-top: 20px;
+  //border-top: 1px solid #e8e8e8;
 }
 
 .recommendations-content {
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 .recommendations-content h4 {
   font-size: 18px;
   margin: 0 0 16px 0;
+  text-align: center;
 }
 
 .recommendations-text {
   background-color: #f9f9f9;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
-  padding: 20px;
+  padding: 25px;
+  min-height: 600px;
+  max-height: 600px;
+  overflow-y: auto;
+  line-height: 1.8;
 }
 
 .recommendations-text p {
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0 0 12px 0;
+  font-size: 15px;
+  line-height: 1.8;
+  margin: 0 0 15px 0;
+  text-align: justify;
 }
 
 .recommendations-text p:last-child {
