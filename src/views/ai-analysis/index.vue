@@ -184,6 +184,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Plus, Document, Close, Loading, ArrowDown } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
+import request from '@/utils/request'
 
 // 用户信息
 const user = ref({
@@ -414,18 +415,19 @@ const startAnalysis = async () => {
   formData.append('file', uploadedFile.value.file)
 
   try {
-    // 调用后端分析接口
-    const response = await fetch('/ai/contentAnalyse', {
-      method: 'POST',
-      body: formData
+    // 使用若依框架的request方法调用后端接口
+    const result = await request({
+      url: '/ai/contentAnalyse',
+      method: 'post',
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      timeout: 60000 // 60秒超时
     })
 
-    if (!response.ok) {
-      throw new Error('分析リクエストが失敗しました')
-    }
-
-    const data = await response.json()
-    analysisResult.value = data
+    // 若依框架的request方法会自动处理响应格式
+    analysisResult.value = result.data
 
     // 模拟延迟，让用户看到加载效果
     setTimeout(() => {
