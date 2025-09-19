@@ -186,7 +186,7 @@ import { Plus, Document, Close, Loading, ArrowDown } from '@element-plus/icons-v
 import * as echarts from 'echarts'
 import request from '@/utils/request'
 import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
+import autoTable from 'jspdf-autotable'
 
 // 用户信息
 const user = ref({
@@ -510,50 +510,136 @@ const downloadReport = async () => {
 
   try {
     // 创建PDF实例
-    const pdf = new jsPDF('p', 'mm', 'a4')
+    const doc = new jsPDF('p', 'mm', 'a4')
 
-    // 获取三个结果页面的DOM元素
-    const resultSections = [
-      document.querySelector('.result-section'),
-      document.querySelector('.dimensions-section'),
-      document.querySelector('.recommendations-section')
-    ]
+    // 添加标题
+    doc.setFontSize(20)
+    doc.setTextColor(40, 40, 40)
+    doc.text('PaperPurify 分析レポート', 105, 20, { align: 'center' })
 
-    // 依次处理每个部分
-    for (let i = 0; i < resultSections.length; i++) {
-      const section = resultSections[i]
-      if (!section) continue
+    // 添加日期
+    doc.setFontSize(12)
+    doc.setTextColor(100, 100, 100)
+    const now = new Date()
+    doc.text(`生成日: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 105, 30, { align: 'center' })
 
-      // 将HTML内容转换为canvas
-      const canvas = await html2canvas(section, {
-        scale: 2, // 提高分辨率
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      })
+    let yPosition = 45
 
-      // 将canvas转换为图像数据
-      const imgData = canvas.toDataURL('image/png', 1.0)
+    // 1. 添加AI生成可能性部分
+    doc.setFontSize(16)
+    doc.setTextColor(40, 40, 40)
+    doc.text('AI生成可能性分析', 20, yPosition)
+    yPosition += 10
 
-      // 获取PDF页面尺寸
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = pdf.internal.pageSize.getHeight()
+    doc.setFontSize(14)
+    const aiProbabilityText = analysisResult.value.aiScore >= 70 ? '高い' :
+        analysisResult.value.aiScore >= 40 ? '中' : '低い'
+    doc.text(`本文AI生成の可能性: ${aiProbabilityText} (${analysisResult.value.aiScore}%)`, 20, yPosition)
+    yPosition += 15
 
-      // 计算图像在PDF中的尺寸
-      const imgWidth = pdfWidth
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width
+    // 添加AI维度评分表格 - 使用autoTable函数而不是doc.autoTable
+    autoTable(doc, {
+      startY: yPosition,
+      head: [['評価维度', 'レベル', '評価内容']],
+      body: analysisResult.value.aiDimensions.map(d => [d.name, d.level, d.evaluation]),
+      theme: 'grid',
+      headStyles: {
+        fillColor: [40, 40, 40],
+        textColor: 255
+      },
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+        lineColor: [200, 200, 200]
+      },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 20 },
+        2: { cellWidth: 'auto' }
+      }
+    })
 
-      // 添加新页面（除了第一页）
-      if (i > 0) {
-        pdf.addPage()
+    yPosition = doc.lastAutoTable.finalY + 15
+
+    // 添加新页面
+    doc.addPage()
+    yPosition = 20
+
+    // 2. 添加详细评价部分
+    doc.setFontSize(16)
+    doc.setTextColor(40, 40, 40)
+    doc.text('詳細評価', 20, yPosition)
+    yPosition += 10
+
+    // 添加质量维度评分表格 - 使用autoTable函数而不是doc.autoTable
+    autoTable(doc, {
+      startY: yPosition,
+      head: [['評価维度', 'スコア', '評価内容']],
+      body: analysisResult.value.qualityDimensions.map(d => [d.name, d.score, d.evaluation]),
+      theme: 'grid',
+      headStyles: {
+        fillColor: [40, 40, 40],
+        textColor: 255
+      },
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+        lineColor: [200, 200, 200]
+      },
+      columnStyles: {
+        0: { cellWidth: 45 },
+        1: { cellWidth: 20 },
+        2: { cellWidth: 'auto' }
+      }
+    })
+
+    yPosition = doc.lastAutoTable.finalY + 15
+
+    // 添加雷达图占位说明
+    doc.setFontSize(12)
+    doc.setTextColor(100, 100, 100)
+    doc.text('※ 詳細なレーダーチャートはWebアプリケーションでご確認ください', 20, yPosition)
+
+    // 添加新页面
+    doc.addPage()
+    yPosition = 20
+
+    // 3. 添加修改建议部分
+    doc.setFontSize(16)
+    doc.setTextColor(40, 40, 40)
+    doc.text('修改建议', 20, yPosition)
+    yPosition += 10
+
+    doc.setFontSize(12)
+    doc.setTextColor(80, 80, 80)
+    doc.text('AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供極、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。', 20, yPosition, { maxWidth: 170 })
+    yPosition += 15
+
+    // 添加建议列表
+    analysisResult.value.recommendations.forEach((rec, index) => {
+      if (yPosition > 250) {
+        doc.addPage()
+        yPosition = 20
       }
 
-      // 添加图像到PDF
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+      doc.setFontSize(12)
+      doc.setTextColor(40, 40, 40)
+      doc.text(`${index + 1}. ${rec}`, 25, yPosition, { maxWidth: 160 })
+      yPosition += 20
+    })
+
+    // 添加页脚
+    const totalPages = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.setTextColor(150, 150, 150)
+      doc.text(`ページ ${i} / ${totalPages}`, 105, 285, { align: 'center' })
+      doc.text('PaperPurify - 論文のAI成分を浄化し、学術を初心に戻す', 105, 290, { align: 'center' })
     }
 
-    // 保存PDF文件
-    pdf.save('PaperPurify_分析レポート.pdf')
+    // 保存PDF
+    doc.save('PaperPurify_分析レポート.pdf')
 
     ElMessage.success('PDFのエクスポートが完了しました')
   } catch (error) {
