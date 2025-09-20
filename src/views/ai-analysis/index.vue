@@ -784,11 +784,14 @@ const router = useRouter()
 
 .username {
   font-size: 16px;
+  vertical-align: middle;
 }
 
 .logout-btn {
   color: #fff;
   margin-left: 15px;
+  font-size: 16px;
+  vertical-align: middle;
 }
 
 /* 主内容区域 */
