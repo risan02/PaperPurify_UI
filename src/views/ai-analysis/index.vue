@@ -913,6 +913,7 @@ const router = useRouter()
   padding: 12px 30px;
   font-size: 16px;
   font-weight: 500;
+  width: 200px;
 }
 
 .back-btn:hover {
@@ -928,6 +929,7 @@ const router = useRouter()
   padding: 12px 40px;
   font-size: 16px;
   font-weight: 500;
+  width: 200px;
 }
 
 .continue-btn:disabled {
@@ -938,6 +940,7 @@ const router = useRouter()
 
 .scroll-btn {
   background-color: #1890ff;
+  width: 200px;
 }
 
 .scroll-btn:hover {
@@ -1153,23 +1156,6 @@ const router = useRouter()
   font-size: 12px;
   margin: 6px 0 0 0;
   line-height: 1.5;
-}
-
-/* 继续按钮 */
-.continue-btn {
-  background-color: #000;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 12px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.continue-btn:disabled {
-  background-color: #d9d9d9;
-  color: #999;
-  cursor: not-allowed;
 }
 
 /* 结果区域 - 页面3: 修改建议 */
