@@ -1,74 +1,113 @@
 <template>
-  <div class="register">
-    <el-form ref="registerRef" :model="registerForm" :rules="registerRules" class="register-form">
-      <h3 class="title">{{ title }}</h3>
-      <el-form-item prop="username">
-        <el-input 
-          v-model="registerForm.username" 
-          type="text" 
-          size="large" 
-          auto-complete="off" 
-          placeholder="账号"
-        >
-          <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="password">
-        <el-input
-          v-model="registerForm.password"
-          type="password"
-          size="large" 
-          auto-complete="off"
-          placeholder="密码"
-          @keyup.enter="handleRegister"
-        >
-          <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="confirmPassword">
-        <el-input
-          v-model="registerForm.confirmPassword"
-          type="password"
-          size="large" 
-          auto-complete="off"
-          placeholder="确认密码"
-          @keyup.enter="handleRegister"
-        >
-          <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
-        </el-input>
-      </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input
-          size="large" 
-          v-model="registerForm.code"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter="handleRegister"
-        >
-          <template #prefix><svg-icon icon-class="validCode" class="el-input__icon input-icon" /></template>
-        </el-input>
-        <div class="register-code">
-          <img :src="codeUrl" @click="getCode" class="register-code-img"/>
+  <div class="register-container">
+    <!-- 顶部黑色导航区域 -->
+    <div class="top-section">
+      <div class="top-left">
+        <h1>PaperPurify</h1>
+      </div>
+      <div class="top-right">
+        <div class="user-info">
+          <el-avatar :size="40" src="" />
+          <span class="username">ゲスト</span>
+          <el-button link class="logout-btn" @click="goToLogin">ログインへ戻る</el-button>
         </div>
-      </el-form-item>
-      <el-form-item style="width:100%;">
-        <el-button
-          :loading="loading"
-          size="large" 
-          type="primary"
-          style="width:100%;"
-          @click.prevent="handleRegister"
-        >
-          <span v-if="!loading">注 册</span>
-          <span v-else>注 册 中...</span>
-        </el-button>
-        <div style="float: right;">
-          <router-link class="link-type" :to="'/login'">使用已有账户登录</router-link>
+      </div>
+    </div>
+
+    <!-- 主要内容区域 - 左右布局 -->
+    <div class="main-content">
+      <!-- 左侧品牌宣传区域 -->
+      <div class="left-content">
+        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
+        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <div class="brand-decoration">
+          <el-icon :size="80"><Document /></el-icon>
         </div>
-      </el-form-item>
-    </el-form>
-    <!--  底部  -->
+      </div>
+
+      <!-- 右侧注册表单区域 -->
+      <div class="right-content">
+        <div class="register-form-container">
+          <h3 class="form-title">新規登録</h3>
+
+          <el-form ref="registerRef" :model="registerForm" :rules="registerRules" class="register-form">
+            <el-form-item prop="username">
+              <el-input
+                  v-model="registerForm.username"
+                  type="text"
+                  size="large"
+                  auto-complete="off"
+                  placeholder="アカウント"
+              >
+                <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
+              </el-input>
+            </el-form-item>
+
+            <el-form-item prop="password">
+              <el-input
+                  v-model="registerForm.password"
+                  type="password"
+                  size="large"
+                  auto-complete="off"
+                  placeholder="パスワード"
+                  @keyup.enter="handleRegister"
+              >
+                <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
+              </el-input>
+            </el-form-item>
+
+            <el-form-item prop="confirmPassword">
+              <el-input
+                  v-model="registerForm.confirmPassword"
+                  type="password"
+                  size="large"
+                  auto-complete="off"
+                  placeholder="パスワード確認"
+                  @keyup.enter="handleRegister"
+              >
+                <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
+              </el-input>
+            </el-form-item>
+
+            <el-form-item prop="code" v-if="captchaEnabled">
+              <el-input
+                  size="large"
+                  v-model="registerForm.code"
+                  auto-complete="off"
+                  placeholder="確認コード"
+                  style="width: 63%"
+                  @keyup.enter="handleRegister"
+              >
+                <template #prefix><svg-icon icon-class="validCode" class="el-input__icon input-icon" /></template>
+              </el-input>
+              <div class="register-code">
+                <img :src="codeUrl" @click="getCode" class="register-code-img"/>
+              </div>
+            </el-form-item>
+
+            <el-form-item style="width:100%;">
+              <el-button
+                  :loading="loading"
+                  size="large"
+                  type="primary"
+                  class="register-btn"
+                  @click.prevent="handleRegister"
+              >
+                <span v-if="!loading">登録</span>
+                <span v-else>登録中...</span>
+              </el-button>
+
+              <div class="login-link">
+                <span>すでにアカウントをお持ちですか？</span>
+                <router-link class="link-type" :to="'/login'">ログイン</router-link>
+              </div>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部版权信息 -->
     <div class="el-register-footer">
       <span>Copyright © 2018-2025 sunny.vip All Rights Reserved.</span>
     </div>
@@ -78,6 +117,7 @@
 <script setup>
 import { ElMessageBox } from "element-plus"
 import { getCodeImg, register } from "@/api/login"
+import { Document } from '@element-plus/icons-vue'
 
 const title = import.meta.env.VITE_APP_TITLE
 const router = useRouter()
@@ -152,29 +192,109 @@ function getCode() {
   })
 }
 
+function goToLogin() {
+  router.push('/login')
+}
+
 getCode()
 </script>
 
 <style lang='scss' scoped>
-.register {
+.register-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 顶部黑色区域 */
+.top-section {
+  background-color: #000;
+  color: #fff;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-left h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.username {
+  font-size: 16px;
+}
+
+.logout-btn {
+  color: #fff;
+  margin-left: 15px;
+}
+
+/* 主内容区域 */
+.main-content {
+  flex: 1;
+  display: flex;
+  background-color: #fff;
+}
+
+/* 左侧品牌宣传区域 */
+.left-content {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left-content h2 {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.left-content p {
+  font-size: 16px;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.brand-decoration {
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* 右侧注册表单区域 */
+.right-content {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
-  background-size: cover;
+  padding: 40px;
 }
-.title {
-  margin: 0px auto 30px auto;
+
+.register-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-title {
   text-align: center;
-  color: #707070;
+  margin-bottom: 30px;
+  font-size: 24px;
+  color: #333;
 }
 
 .register-form {
-  border-radius: 6px;
-  background: #ffffff;
-  width: 400px;
-  padding: 25px 25px 5px 25px;
   .el-input {
     height: 40px;
     input {
@@ -187,11 +307,37 @@ getCode()
     margin-left: 0px;
   }
 }
-.register-tip {
-  font-size: 13px;
-  text-align: center;
-  color: #bfbfbf;
+
+.register-btn {
+  width: 100%;
+  background-color: #000;
+  border-color: #000;
+  color: #fff;
+  margin-top: 10px;
 }
+
+.register-btn:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.login-link .link-type {
+  margin-left: 5px;
+  color: #1890ff;
+  text-decoration: none;
+}
+
+.login-link .link-type:hover {
+  text-decoration: underline;
+}
+
 .register-code {
   width: 33%;
   height: 40px;
@@ -201,20 +347,36 @@ getCode()
     vertical-align: middle;
   }
 }
+
 .el-register-footer {
   height: 40px;
   line-height: 40px;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
   text-align: center;
-  color: #fff;
+  color: #999;
   font-family: Arial;
   font-size: 12px;
   letter-spacing: 1px;
+  padding: 20px 0;
 }
+
 .register-code-img {
   height: 40px;
   padding-left: 12px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .left-content {
+    padding: 30px;
+    text-align: center;
+  }
+
+  .right-content {
+    padding: 20px;
+  }
 }
 </style>
