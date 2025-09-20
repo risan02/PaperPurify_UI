@@ -190,12 +190,13 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElLoading } from 'element-plus'
+import { ElMessage, ElLoading, ElMessageBox } from 'element-plus'
 import { Plus, Document, Close, Loading, ArrowDown, ArrowLeft } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import request from '@/utils/request'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import useUserStore from '@/store/modules/user'
 
 // 用户信息
 const user = ref({
@@ -677,11 +678,18 @@ const downloadReport = async () => {
   }
 }
 
+const userStore = useUserStore()
 // 退出登录
 const handleLogout = () => {
-  // 调用退出登录接口
-  ElMessage.success('ログアウトしました')
-  router.push('/login')
+  ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    userStore.logOut().then(() => {
+      location.href = '/'
+    })
+  }).catch(() => { })
 }
 
 // 根据分数获取标签
