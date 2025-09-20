@@ -305,7 +305,7 @@ const initChart = () => {
 
   // 添加动画效果
   let currentValue = 0
-  const animationDuration = 1500
+  const animationDuration = 100
   const animationFrame = 16
   const totalFrames = animationDuration / animationFrame
   const valueIncrement = analysisResult.value.aiScore / totalFrames
@@ -489,13 +489,33 @@ const goBack = () => {
     pageHistory.value.pop()
 
     // 获取上一个页面
-    const prevPage = pageHistory.value[pageHistory.value.length - 1]
+    let prevPage = pageHistory.value[pageHistory.value.length - 1]
+
+    // 特殊处理：如果上一个页面是分析中状态，继续回退
+    while (prevPage === 'analyzing' && pageHistory.value.length > 1) {
+      pageHistory.value.pop()
+      prevPage = pageHistory.value[pageHistory.value.length - 1]
+    }
 
     // 处理特殊页面
     if (prevPage === 'analysisComplete') {
       // 回到分析完成状态，默认显示第一个页面
       pageState.value = 'analysisComplete'
       resultPage.value = 'probability'
+      nextTick(() => {
+        initChart() // 重新初始化饼图
+      })
+    } else if (prevPage === 'dimensions') {
+      // 直接回退到维度页面
+      pageState.value = 'analysisComplete'
+      resultPage.value = 'dimensions'
+      nextTick(() => {
+        initRadarChart() // 重新初始化雷达图
+      })
+    } else if (prevPage === 'recommendations') {
+      // 直接回退到建议页面
+      pageState.value = 'analysisComplete'
+      resultPage.value = 'recommendations'
     } else {
       pageState.value = prevPage
     }
