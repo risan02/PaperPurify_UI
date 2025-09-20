@@ -82,7 +82,7 @@
 
         <div class="analyzing-area">
           <div class="loading-indicator">
-            <el-icon class="loading-icon"><Loading /></el-icon>
+            <div class="red-circle-loader"></div>
             <p>論文AI成分净化中...</p>
           </div>
         </div>
@@ -1235,5 +1235,21 @@ const router = useRouter()
     padding: 0;
     margin: 0;
   }
+}
+
+/* 红色旋转圆圈加载动画 */
+.red-circle-loader {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(245, 108, 108, 0.3);
+  border-top: 4px solid #f56c6c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
