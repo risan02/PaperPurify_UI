@@ -424,7 +424,7 @@ const startAnalysis = async () => {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
-      timeout: 60000 // 60秒超时
+      timeout: 120000 // 120秒超时
     })
 
     // 若依框架的request方法会自动处理响应格式
