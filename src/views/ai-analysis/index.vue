@@ -123,6 +123,9 @@
         </div>
 
         <div class="button-container">
+          <el-button class="back-btn" v-if="canGoBack" @click="goBack">
+            <el-icon><ArrowLeft /></el-icon> 戻る
+          </el-button>
           <el-button class="continue-btn" @click="switchToDimensions">
             生成具体评价
           </el-button>
@@ -147,13 +150,16 @@
         </div>
       </div>
 
-      <div class="button-container">
-        <el-button class="continue-btn scroll-btn" @click="switchToRecommendations">
-          <el-icon><ArrowDown /></el-icon>
-          下滑展示更多
-        </el-button>
+        <div class="button-container">
+          <el-button class="back-btn" @click="goBack">
+            <el-icon><ArrowLeft /></el-icon> 戻る
+          </el-button>
+          <el-button class="continue-btn scroll-btn" @click="switchToRecommendations">
+            <el-icon><ArrowDown /></el-icon>
+            下滑展示更多
+          </el-button>
+        </div>
       </div>
-    </div>
 
     <!-- 分析完成状态 - 页面3: 修改建议 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'recommendations'" class="recommendations-section">
@@ -168,13 +174,16 @@
         </div>
       </div>
 
-      <div class="button-container">
-        <el-button class="continue-btn" @click="downloadReport">
-          PDFをエクスポート
-        </el-button>
+        <div class="button-container">
+          <el-button class="back-btn" @click="goBack">
+            <el-icon><ArrowLeft /></el-icon> 戻る
+          </el-button>
+          <el-button class="continue-btn" @click="downloadReport">
+            PDFをエクスポート
+          </el-button>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -182,7 +191,7 @@
 import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElLoading } from 'element-plus'
-import { Plus, Document, Close, Loading, ArrowDown } from '@element-plus/icons-vue'
+import { Plus, Document, Close, Loading, ArrowDown, ArrowLeft } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import request from '@/utils/request'
 import jsPDF from 'jspdf'
@@ -204,6 +213,9 @@ const chart = ref(null)
 const radarChart = ref(null)
 let chartInstance = null
 let radarChartInstance = null
+
+// 页面历史记录
+const pageHistory = ref([])
 
 // 模拟分析结果
 const mockAnalysisResult = {
@@ -396,6 +408,7 @@ const handleFileUpload = (event) => {
   }
 
   pageState.value = 'fileUploaded'
+  addToHistory('fileUploaded')
 }
 
 // 移除已选文件
@@ -403,6 +416,7 @@ const removeFile = () => {
   uploadedFile.value = null
   pageState.value = 'initial'
   fileInput.value.value = ''
+  addToHistory('initial')
 }
 
 // 开始分析
@@ -410,6 +424,7 @@ const startAnalysis = async () => {
   if (!uploadedFile.value) return
 
   pageState.value = 'analyzing'
+  addToHistory('analyzing')
 
   // 创建FormData对象上传文件
   const formData = new FormData()
@@ -434,6 +449,7 @@ const startAnalysis = async () => {
     setTimeout(() => {
       pageState.value = 'analysisComplete'
       resultPage.value = 'probability'
+      addToHistory('analysisComplete')
       nextTick(() => {
         initChart()
       })
@@ -442,12 +458,14 @@ const startAnalysis = async () => {
   } catch (error) {
     ElMessage.error('分析中にエラーが発生しました: ' + error.message)
     pageState.value = 'fileUploaded'
+    addToHistory('fileUploaded')
   }
 }
 
 // 切换到维度评价页面
 const switchToDimensions = () => {
   resultPage.value = 'dimensions'
+  addToHistory('dimensions')
   nextTick(() => {
     initRadarChart()
   })
@@ -456,47 +474,37 @@ const switchToDimensions = () => {
 // 切换到建议页面
 const switchToRecommendations = () => {
   resultPage.value = 'recommendations'
+  addToHistory('recommendations')
 }
 
-// 退出登录
-const handleLogout = () => {
-  // 调用退出登录接口
-  ElMessage.success('ログアウトしました')
-  router.push('/login')
+// 添加历史记录
+const addToHistory = (page) => {
+  pageHistory.value.push(page)
 }
 
-// 根据分数获取标签
-const getScoreLabel = (score) => {
-  if (score >= 80) return '高い'
-  if (score >= 60) return '中'
-  return '低い'
+// 后退功能
+const goBack = () => {
+  if (pageHistory.value.length > 1) {
+    // 移除当前页面
+    pageHistory.value.pop()
+
+    // 获取上一个页面
+    const prevPage = pageHistory.value[pageHistory.value.length - 1]
+
+    // 处理特殊页面
+    if (prevPage === 'analysisComplete') {
+      // 回到分析完成状态，默认显示第一个页面
+      pageState.value = 'analysisComplete'
+      resultPage.value = 'probability'
+    } else {
+      pageState.value = prevPage
+    }
+  }
 }
 
-// 根据分数获取颜色
-const getScoreColor = (score) => {
-  if (score >= 80) return '#f56c6c' // 红色表示高风险
-  if (score >= 60) return '#e6a23c' // 黄色表示中等风险
-  return '#67c23a' // 绿色表示低风险
-}
-
-// 根据质量分数获取颜色
-const getQualityScoreColor = (score) => {
-  if (score >= 85) return '#67c23a' // 绿色表示高质量
-  if (score >= 70) return '#e6a23c' // 黄色表示中等质量
-  return '#f56c6c' // 红色表示低质量
-}
-
-// 计算AI可能性文本和样式
-const aiProbabilityText = computed(() => {
-  if (analysisResult.value.aiScore >= 70) return '高い'
-  if (analysisResult.value.aiScore >= 40) return '中'
-  return '低い'
-})
-
-const probabilityClass = computed(() => {
-  if (analysisResult.value.aiScore >= 70) return 'high-probability'
-  if (analysisResult.value.aiScore >= 40) return 'medium-probability'
-  return 'low-probability'
+// 检查是否可以后退
+const canGoBack = computed(() => {
+  return pageHistory.value.length > 1
 })
 
 // 下载报告,导出PDF
@@ -649,10 +657,53 @@ const downloadReport = async () => {
   }
 }
 
+// 退出登录
+const handleLogout = () => {
+  // 调用退出登录接口
+  ElMessage.success('ログアウトしました')
+  router.push('/login')
+}
+
+// 根据分数获取标签
+const getScoreLabel = (score) => {
+  if (score >= 80) return '高い'
+  if (score >= 60) return '中'
+  return '低い'
+}
+
+// 根据分数获取颜色
+const getScoreColor = (score) => {
+  if (score >= 80) return '#f56c6c' // 红色表示高风险
+  if (score >= 60) return '#e6a23c' // 黄色表示中等风险
+  return '#67c23a' // 绿色表示低风险
+}
+
+// 根据质量分数获取颜色
+const getQualityScoreColor = (score) => {
+  if (score >= 85) return '#67c23a' // 绿色表示高质量
+  if (score >= 70) return '#e6a23c' // 黄色表示中等质量
+  return '#f56c6c' // 红色表示低质量
+}
+
+// 计算AI可能性文本和样式
+const aiProbabilityText = computed(() => {
+  if (analysisResult.value.aiScore >= 70) return '高い'
+  if (analysisResult.value.aiScore >= 40) return '中'
+  return '低い'
+})
+
+const probabilityClass = computed(() => {
+  if (analysisResult.value.aiScore >= 70) return 'high-probability'
+  if (analysisResult.value.aiScore >= 40) return 'medium-probability'
+  return 'low-probability'
+})
+
 // 组件挂载和卸载
 onMounted(() => {
   // 初始化时可以使用模拟数据
   analysisResult.value = mockAnalysisResult
+  // 添加初始页面到历史记录
+  addToHistory('initial')
 })
 
 onBeforeUnmount(() => {
@@ -822,6 +873,22 @@ const router = useRouter()
   display: flex;
   justify-content: center;
   margin-top: 10px;
+  gap: 15px;
+}
+
+/* 后退按钮 */
+.back-btn {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #d9d9d9;
+  border-radius: 20px;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.back-btn:hover {
+  background-color: #e6e6e6;
 }
 
 /* 继续按钮 */
@@ -833,7 +900,6 @@ const router = useRouter()
   padding: 12px 40px;
   font-size: 16px;
   font-weight: 500;
-  margin-top: 20px;
 }
 
 .continue-btn:disabled {
@@ -1102,7 +1168,6 @@ const router = useRouter()
 .recommendations-section .button-container {
   margin-top: 40px;
   padding-top: 20px;
-  //border-top: 1px solid #e8e8e8;
 }
 
 .recommendations-content {
