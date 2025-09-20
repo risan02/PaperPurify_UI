@@ -208,7 +208,6 @@ let radarChartInstance = null
 // 模拟分析结果
 const mockAnalysisResult = {
   aiScore: 75,
-  aiProbability: 'high', // low, medium, high
   aiDimensions: [
     {
       name: '言語的困惑度',
