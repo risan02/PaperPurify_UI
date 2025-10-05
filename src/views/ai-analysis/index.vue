@@ -18,8 +18,8 @@
     <div class="main-content">
       <!-- 初始状态/上传文件 -->
       <div v-if="pageState === 'initial'" class="upload-section">
-        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <h2>あなたの言葉に、AIではなく「思考の痕跡」を残そう。</h2>
+        <p>PaperPurify ― 知の純度を可視化する。</p>
 
         <div class="upload-area" @click="triggerFileInput">
           <div class="upload-placeholder">
@@ -42,15 +42,15 @@
               :disabled="!uploadedFile"
               @click="startAnalysis"
           >
-            继续
+            続行
           </el-button>
         </div>
       </div>
 
       <!-- 文件已上传状态 -->
       <div v-if="pageState === 'fileUploaded'" class="uploaded-section">
-        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <h2>あなたの言葉に、AIではなく「思考の痕跡」を残そう。</h2>
+        <p>PaperPurify ― 知の純度を可視化する。</p>
 
         <div class="file-preview">
           <div class="file-card">
@@ -70,15 +70,15 @@
 
       <div class="button-container">
         <el-button class="continue-btn" @click="startAnalysis">
-          继续
+          続行
         </el-button>
       </div>
     </div>
 
       <!-- 分析中状态 -->
       <div v-if="pageState === 'analyzing'" class="analyzing-section">
-        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <h2>あなたの言葉に、AIではなく「思考の痕跡」を残そう。</h2>
+        <p>PaperPurify ― 知の純度を可視化する。</p>
 
         <div class="analyzing-area">
           <div class="loading-indicator">
@@ -156,7 +156,7 @@
           </el-button>
           <el-button class="continue-btn scroll-btn" @click="switchToRecommendations">
             <el-icon><ArrowDown /></el-icon>
-            下滑展示更多
+            show more
           </el-button>
         </div>
       </div>

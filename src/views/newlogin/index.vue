@@ -7,16 +7,15 @@
         <img src="@/assets/logo/logo_japan.png" alt="Logo" class="logo-img" @error="handleImageError">
       </div>
       <div class="left-content">
-        <h1>回归学术本质，XXXXXXXX</h1>
-        <p>文本文本文本文本文本文本</p>
-        <p>文文本本文本文本文本文本</p>
+        <h1>あなたの言葉に、AIではなく「思考の痕跡」を残そう。</h1>
+        <p>PaperPurify ― 知の純度を可視化する。</p>
       </div>
     </div>
 
     <!-- 右侧登录区域 -->
     <div class="login-right">
       <div class="login-box">
-        <h2 class="login-title">登陆</h2>
+        <h2 class="login-title">ログイン</h2>
 
         <el-form
             ref="loginRef"
@@ -29,7 +28,7 @@
                 v-model="loginForm.username"
                 type="text"
                 auto-complete="off"
-                placeholder="账号"
+                placeholder="アカウント"
                 class="custom-input"
             >
               <template #prefix>
@@ -43,7 +42,7 @@
                 v-model="loginForm.password"
                 type="password"
                 auto-complete="off"
-                placeholder="密码"
+                placeholder="パスワード"
                 @keyup.enter="handleLogin"
                 class="custom-input"
             >
@@ -60,14 +59,14 @@
                 class="login-btn"
                 @click.prevent="handleLogin"
             >
-              <span v-if="!loading">登陆</span>
-              <span v-else>登陆中...</span>
+              <span v-if="!loading">ログイン</span>
+              <span v-else>ログイン中...</span>
             </el-button>
           </el-form-item>
 
           <el-form-item>
             <el-button class="register-btn" @click.prevent="handleRegister">
-              注册
+              新規登録
             </el-button>
           </el-form-item>
         </el-form>
