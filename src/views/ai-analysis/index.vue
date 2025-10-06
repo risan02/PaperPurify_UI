@@ -127,7 +127,7 @@
             <el-icon><ArrowLeft /></el-icon> 戻る
           </el-button>
           <el-button class="continue-btn" @click="switchToDimensions">
-            生成具体评价
+            評価内容
           </el-button>
         </div>
       </div>
@@ -163,7 +163,7 @@
 
     <!-- 分析完成状态 - 页面3: 修改建议 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'recommendations'" class="recommendations-section">
-      <h2>修改建议</h2>
+      <h2>修正提案</h2>
       <p>AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供し、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。</p>
 
       <div class="recommendations-content">
