@@ -83,7 +83,7 @@
         <div class="analyzing-area">
           <div class="loading-indicator">
             <div class="red-circle-loader"></div>
-            <p>論文AI成分净化中...</p>
+            <p>文書AI率計算中...</p>
           </div>
         </div>
 
@@ -135,7 +135,7 @@
     <!-- 分析完成状态 - 页面2: 详细评价 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'dimensions'" class="dimensions-section">
       <h2>詳細評価</h2>
-      <p>論文の質を6つの次元で評価しました</p>
+      <p>文書の質を6つの次元で評価しました</p>
 
       <div class="radar-chart-container">
         <div class="radar-chart" ref="radarChart"></div>
@@ -682,8 +682,8 @@ const userStore = useUserStore()
 // 退出登录
 const handleLogout = () => {
   ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+    confirmButtonText: 'はい',
+    cancelButtonText: 'いいえ',
     type: 'warning'
   }).then(() => {
     userStore.logOut().then(() => {
