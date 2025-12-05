@@ -198,11 +198,14 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import useUserStore from '@/store/modules/user'
 
-// 用户信息
-const user = ref({
-  name: 'ユーザー名',
-  avatar: ''
-})
+// 获取用户Store实例
+const userStore = useUserStore()
+
+// 用户信息 - 使用computed响应式获取，确保userStore更新时自动同步
+const user = computed(() => ({
+  name: userStore.nickName || userStore.name || 'ユーザー名',
+  avatar: userStore.avatar || ''
+}))
 
 // 页面状态管理
 const pageState = ref('initial')
@@ -697,7 +700,6 @@ const downloadReport = async () => {
   }
 }
 
-const userStore = useUserStore()
 // 退出登录
 const handleLogout = () => {
   ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
