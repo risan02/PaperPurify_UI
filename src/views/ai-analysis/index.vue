@@ -112,9 +112,9 @@
             <div class="dimension" v-for="(dimension, index) in analysisResult.aiDimensions" :key="index">
               <div class="dimension-header">
                 <h4>{{ dimension.name }}</h4>
-                <!-- 将色块放在维度标题右边 -->
-                <div class="score-level" :class="dimension.level">
-                  {{ dimension.level }}
+                <!-- 显示数字分数（0.0-10.0），分数越高越接近人类写作 -->
+                <div class="score-level" :class="getLevelClass(dimension.level)">
+                  {{ formatLevel(dimension.level) }}
                 </div>
               </div>
               <p class="evaluation">{{ dimension.evaluation }}</p>
@@ -224,18 +224,33 @@ const mockAnalysisResult = {
   aiDimensions: [
     {
       name: '言語的困惑度',
-      level: '高',
+      level: 2.5,
       evaluation: '専門用語が使われているにもかかわらず、文章の構造があまりにも整然としていて、自然な流暢さに欠けている。'
     },
     {
-      name: '構造とテンプレート使用傾向',
-      level: '中',
-      evaluation: '抽象的な定義から入り、論理展開が非常に典型的で、独自性に欠ける。'
+      name: '句式変化幅',
+      level: 3.2,
+      evaluation: '文章の表現パターンが非常に均一で、人間が書いた文章に特徴的な多様性が不足している。'
     },
     {
-      name: '専門用語密度と論理的一貫性',
-      level: '高',
-      evaluation: '「第一性原理的思考」「制度設計」「政策立案型エコノミスト」など高度な専門用語が一貫して使用されているが、論理展開にやや無理がある。'
+      name: '意味分布エントロピー',
+      level: 4.8,
+      evaluation: '意味の分布はある程度多様性を示しているが、完全に自然な人間の文章とは異なる特徴が見られる。'
+    },
+    {
+      name: '推論複雑性',
+      level: 5.5,
+      evaluation: '論理展開は基本的に一貫しているが、推論の複雑さや深さに改善の余地がある。'
+    },
+    {
+      name: '感情起伏度',
+      level: 3.8,
+      evaluation: '文章全体の感情表現がやや平坦で、人間の文章に特徴的な感情の起伏が少ない。'
+    },
+    {
+      name: '構造とテンプレート使用傾向',
+      level: 4.2,
+      evaluation: '抽象的な定義から入り、論理展開が非常に典型的で、独自性に欠ける。'
     }
   ],
   qualityDimensions: [
@@ -569,7 +584,11 @@ const downloadReport = async () => {
     autoTable(doc, {
       startY: yPosition,
       head: [['評価维度', 'レベル', '評価内容']],
-      body: analysisResult.value.aiDimensions.map(d => [d.name, d.level, d.evaluation]),
+      body: analysisResult.value.aiDimensions.map(d => [
+        d.name,
+        typeof d.level === 'number' ? d.level.toFixed(1) : d.level,
+        d.evaluation
+      ]),
       theme: 'grid',
       headStyles: {
         fillColor: [40, 40, 40],
@@ -711,6 +730,26 @@ const getQualityScoreColor = (score) => {
   if (score >= 85) return '#67c23a' // 绿色表示高质量
   if (score >= 70) return '#e6a23c' // 黄色表示中等质量
   return '#f56c6c' // 红色表示低质量
+}
+
+// 根据level数字值（0.0-10.0）返回对应的颜色class
+// 分数越高越接近人类写作，分数越低AI痕迹越明显
+const getLevelClass = (level) => {
+  if (typeof level === 'number') {
+    if (level >= 7.0) return 'level-high' // 7.0-10.0：接近人类写作，绿色
+    if (level >= 4.0) return 'level-medium' // 4.0-6.9：中等，黄色
+    return 'level-low' // 0.0-3.9：AI痕迹明显，红色
+  }
+  // 兼容旧数据格式（如果level是字符串）
+  return 'level-medium'
+}
+
+// 格式化level数字，保留1位小数
+const formatLevel = (level) => {
+  if (typeof level === 'number') {
+    return level.toFixed(1)
+  }
+  return level || '0.0'
 }
 
 // 计算AI可能性文本和样式
@@ -986,10 +1025,12 @@ const router = useRouter()
 
 /* 结果区域 - 页面1: AI生成可能性 */
 .result-content {
-  width: 800px;
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   margin-bottom: 40px;
   gap: 40px;
+  flex-wrap: wrap;
 }
 
 .ai-probability {
@@ -1044,9 +1085,31 @@ const router = useRouter()
 
 .dimension-scores {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  min-width: 500px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+}
+
+/* 响应式布局：小屏幕时改为单列 */
+@media (max-width: 1200px) {
+  .result-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .dimension-scores {
+    width: 100%;
+    max-width: 800px;
+    min-width: auto;
+  }
+}
+
+/* 更小屏幕时维度块改为单列 */
+@media (max-width: 768px) {
+  .dimension-scores {
+    grid-template-columns: 1fr;
+  }
 }
 
 .dimension {
@@ -1071,25 +1134,27 @@ const router = useRouter()
 
 .score-level {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 4px 12px;
   border-radius: 4px;
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 8px;
+  white-space: nowrap;
 }
 
-.score-level.高 {
-  background-color: #f56c6c;
+/* 根据level数字值显示颜色：分数越高（越接近人类写作）颜色越绿，分数越低（AI痕迹越明显）颜色越红 */
+.score-level.level-high {
+  background-color: #67c23a; /* 绿色：7.0-10.0，接近人类写作 */
   color: #fff;
 }
 
-.score-level.中 {
-  background-color: #e6a23c;
+.score-level.level-medium {
+  background-color: #e6a23c; /* 黄色：4.0-6.9，中等 */
   color: #fff;
 }
 
-.score-level.低 {
-  background-color: #67c23a;
+.score-level.level-low {
+  background-color: #f56c6c; /* 红色：0.0-3.9，AI痕迹明显 */
   color: #fff;
 }
 
