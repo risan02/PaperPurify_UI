@@ -14,6 +14,9 @@
 
     <!-- 右侧注册区域 -->
     <div class="register-right">
+      <div class="language-switcher-wrapper">
+        <LanguageSwitcher />
+      </div>
       <div class="register-box">
         <h2 class="register-title">{{ $t('register.title') }}</h2>
 
@@ -119,6 +122,7 @@ import { ElMessageBox } from "element-plus"
 import { getCodeImg, register } from "@/api/login"
 import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 const { t } = useI18n()
 const title = import.meta.env.VITE_APP_TITLE
@@ -269,6 +273,14 @@ getCode()
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+
+    .language-switcher-wrapper {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
 
     .register-box {
       width: 100%;
@@ -395,6 +407,11 @@ getCode()
     .register-right {
       width: 100%;
       min-width: auto;
+
+      .language-switcher-wrapper {
+        top: 15px;
+        right: 15px;
+      }
     }
   }
 }

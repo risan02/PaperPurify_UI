@@ -15,6 +15,9 @@
 
     <!-- 右侧登录区域 -->
     <div class="login-right">
+      <div class="language-switcher-wrapper">
+        <LanguageSwitcher />
+      </div>
       <div class="login-box">
         <h2 class="login-title">{{ $t('login.title') }}</h2>
 
@@ -88,6 +91,7 @@ import { encrypt, decrypt } from "@/utils/jsencrypt"
 import useUserStore from '@/store/modules/user'
 import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 const { t } = useI18n()
 const title = import.meta.env.VITE_APP_TITLE
@@ -262,6 +266,14 @@ getCookie()
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+
+    .language-switcher-wrapper {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
 
     .login-box {
       width: 100%;
@@ -370,6 +382,11 @@ getCookie()
     .login-right {
       width: 100%;
       min-width: auto;
+
+      .language-switcher-wrapper {
+        top: 15px;
+        right: 15px;
+      }
     }
   }
 }
