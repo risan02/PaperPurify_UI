@@ -197,14 +197,17 @@ import request from '@/utils/request'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import useUserStore from '@/store/modules/user'
+// 导入默认头像（所有用户使用相同的固定头像）
+import defaultAvatar from '@/assets/images/default-avatar.svg'
 
 // 获取用户Store实例
 const userStore = useUserStore()
 
 // 用户信息 - 使用computed响应式获取，确保userStore更新时自动同步
+// 所有用户使用固定的默认头像
 const user = computed(() => ({
   name: userStore.nickName || userStore.name || 'ユーザー名',
-  avatar: userStore.avatar || ''
+  avatar: defaultAvatar // 使用固定的默认头像
 }))
 
 // 页面状态管理
@@ -853,6 +856,16 @@ const router = useRouter()
 }
 
 .main-content > p {
+  font-size: 16px;
+  text-align: center;
+  margin: 0 0 40px 0;
+  color: #666;
+}
+
+/* 各个section内的描述文本居中显示 */
+.upload-section > p,
+.uploaded-section > p,
+.analyzing-section > p {
   font-size: 16px;
   text-align: center;
   margin: 0 0 40px 0;
