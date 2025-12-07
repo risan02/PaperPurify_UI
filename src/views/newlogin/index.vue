@@ -7,16 +7,16 @@
         <img src="@/assets/logo/logo_japan.png" alt="Logo" class="logo-img" @error="handleImageError">
       </div>
       <div class="left-content">
-        <h1>回归学术本质，XXXXXXXX</h1>
-        <p>文本文本文本文本文本文本</p>
-        <p>文文本本文本文本文本文本</p>
+        <h1>{{ $t('aiAnalysis.title') }}</h1>
+        <p>{{ $t('aiAnalysis.description') }}</p>
+        <p>PaperPurify - {{ $t('common.info') }}</p>
       </div>
     </div>
 
     <!-- 右侧登录区域 -->
     <div class="login-right">
       <div class="login-box">
-        <h2 class="login-title">登陆</h2>
+        <h2 class="login-title">{{ $t('login.title') }}</h2>
 
         <el-form
             ref="loginRef"
@@ -29,7 +29,7 @@
                 v-model="loginForm.username"
                 type="text"
                 auto-complete="off"
-                placeholder="账号"
+                :placeholder="$t('login.usernamePlaceholder')"
                 class="custom-input"
             >
               <template #prefix>
@@ -43,7 +43,7 @@
                 v-model="loginForm.password"
                 type="password"
                 auto-complete="off"
-                placeholder="密码"
+                :placeholder="$t('login.passwordPlaceholder')"
                 @keyup.enter="handleLogin"
                 class="custom-input"
             >
@@ -60,21 +60,21 @@
                 class="login-btn"
                 @click.prevent="handleLogin"
             >
-              <span v-if="!loading">登陆</span>
-              <span v-else>登陆中...</span>
+              <span v-if="!loading">{{ $t('login.loginButton') }}</span>
+              <span v-else>{{ $t('login.loggingIn') }}</span>
             </el-button>
           </el-form-item>
 
           <el-form-item>
             <el-button class="register-btn" @click.prevent="handleRegister">
-              注册
+              {{ $t('common.register') }}
             </el-button>
           </el-form-item>
         </el-form>
 
         <div class="login-footer">
-          <span>利用規約</span>
-          <span>プライバシーポリシー</span>
+          <span>{{ $t('common.termsOfService') }}</span>
+          <span>{{ $t('common.privacyPolicy') }}</span>
         </div>
       </div>
     </div>
@@ -86,7 +86,10 @@ import { getCodeImg } from "@/api/login"
 import Cookies from "js-cookie"
 import { encrypt, decrypt } from "@/utils/jsencrypt"
 import useUserStore from '@/store/modules/user'
+import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
 
+const { t } = useI18n()
 const title = import.meta.env.VITE_APP_TITLE
 const userStore = useUserStore()
 const route = useRoute()
@@ -101,10 +104,11 @@ const loginForm = ref({
   uuid: ""
 })
 
-const loginRules = {
-  username: [{ required: true, trigger: "blur", message: "请输入您的账号" }],
-  password: [{ required: true, trigger: "blur", message: "请输入您的密码" }]
-}
+// 使用computed使验证规则支持动态翻译
+const loginRules = computed(() => ({
+  username: [{ required: true, trigger: "blur", message: t('login.usernameRequired') }],
+  password: [{ required: true, trigger: "blur", message: t('login.passwordRequired') }]
+}))
 
 const codeUrl = ref("")
 const loading = ref(false)

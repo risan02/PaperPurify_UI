@@ -48,6 +48,8 @@ import DictTag from '@/components/DictTag'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 // 引入全局样式文件，确保 Tailwind 和自定义样式生效
 import '@/assets/styles/main.css'
+// 引入i18n国际化配置
+import i18n from '@/locales'
 
 const app = createApp(App)
 
@@ -73,6 +75,7 @@ app.component('Editor', Editor)
 
 app.use(router)
 app.use(store)
+app.use(i18n) // 使用i18n
 app.use(plugins)
 app.use(elementIcons)
 app.component('svg-icon', SvgIcon)

@@ -6,16 +6,16 @@
 
       </div>
       <div class="left-content">
-        <h1>論文のAI成分を浄化し、学術を初心に戻す</h1>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
-        <p>PaperPurify - 学術の純粋性を守る</p>
+        <h1>{{ $t('aiAnalysis.title') }}</h1>
+        <p>{{ $t('aiAnalysis.description') }}</p>
+        <p>PaperPurify - {{ $t('common.info') }}</p>
       </div>
     </div>
 
     <!-- 右侧注册区域 -->
     <div class="register-right">
       <div class="register-box">
-        <h2 class="register-title">新規登録</h2>
+        <h2 class="register-title">{{ $t('register.title') }}</h2>
 
         <el-form
             ref="registerRef"
@@ -28,7 +28,7 @@
                 v-model="registerForm.username"
                 type="text"
                 auto-complete="off"
-                placeholder="アカウント"
+                :placeholder="$t('register.usernamePlaceholder')"
                 class="custom-input"
             >
               <template #prefix>
@@ -42,7 +42,7 @@
                 v-model="registerForm.password"
                 type="password"
                 auto-complete="off"
-                placeholder="パスワード"
+                :placeholder="$t('register.passwordPlaceholder')"
                 @keyup.enter="handleRegister"
                 class="custom-input"
             >
@@ -57,7 +57,7 @@
                 v-model="registerForm.confirmPassword"
                 type="password"
                 auto-complete="off"
-                placeholder="パスワード確認"
+                :placeholder="$t('register.confirmPasswordPlaceholder')"
                 @keyup.enter="handleRegister"
                 class="custom-input"
             >
@@ -71,7 +71,7 @@
             <el-input
                 v-model="registerForm.code"
                 auto-complete="off"
-                placeholder="確認コード"
+                :placeholder="$t('register.codePlaceholder')"
                 style="width: 63%"
                 @keyup.enter="handleRegister"
                 class="custom-input"
@@ -92,22 +92,22 @@
                 class="register-btn"
                 @click.prevent="handleRegister"
             >
-              <span v-if="!loading">登録</span>
-              <span v-else>登録中...</span>
+              <span v-if="!loading">{{ $t('register.registerButton') }}</span>
+              <span v-else>{{ $t('register.registering') }}</span>
             </el-button>
           </el-form-item>
 
           <el-form-item>
             <div class="login-link">
-              <span>すでにアカウントをお持ちですか？</span>
-              <router-link class="link-type" :to="'/login'">ログイン</router-link>
+              <span>{{ $t('register.alreadyHaveAccount') }}</span>
+              <router-link class="link-type" :to="'/login'">{{ $t('common.login') }}</router-link>
             </div>
           </el-form-item>
         </el-form>
 
         <div class="register-footer">
-          <span>利用規約</span>
-          <span>プライバシーポリシー</span>
+          <span>{{ $t('common.termsOfService') }}</span>
+          <span>{{ $t('common.privacyPolicy') }}</span>
         </div>
       </div>
     </div>
@@ -117,7 +117,10 @@
 <script setup>
 import { ElMessageBox } from "element-plus"
 import { getCodeImg, register } from "@/api/login"
+import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
 
+const { t } = useI18n()
 const title = import.meta.env.VITE_APP_TITLE
 const router = useRouter()
 const { proxy } = getCurrentInstance()
@@ -132,28 +135,29 @@ const registerForm = ref({
 
 const equalToPassword = (rule, value, callback) => {
   if (registerForm.value.password !== value) {
-    callback(new Error("两次输入的密码不一致"))
+    callback(new Error(t('register.passwordMismatch')))
   } else {
     callback()
   }
 }
 
-const registerRules = {
+// 使用computed使验证规则支持动态翻译
+const registerRules = computed(() => ({
   username: [
-    { required: true, trigger: "blur", message: "请输入您的账号" },
-    { min: 2, max: 20, message: "用户账号长度必须介于 2 和 20 之间", trigger: "blur" }
+    { required: true, trigger: "blur", message: t('register.usernameRequired') },
+    { min: 2, max: 20, message: t('register.usernameLength'), trigger: "blur" }
   ],
   password: [
-    { required: true, trigger: "blur", message: "请输入您的密码" },
-    { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" },
-    { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }
+    { required: true, trigger: "blur", message: t('register.passwordRequired') },
+    { min: 5, max: 20, message: t('register.passwordLength'), trigger: "blur" },
+    { pattern: /^[^<>"'|\\]+$/, message: t('register.passwordInvalidChars'), trigger: "blur" }
   ],
   confirmPassword: [
-    { required: true, trigger: "blur", message: "请再次输入您的密码" },
+    { required: true, trigger: "blur", message: t('register.confirmPasswordRequired') },
     { required: true, validator: equalToPassword, trigger: "blur" }
   ],
-  code: [{ required: true, trigger: "change", message: "请输入验证码" }]
-}
+  code: [{ required: true, trigger: "change", message: t('register.codeRequired') }]
+}))
 
 const codeUrl = ref("")
 const loading = ref(false)
@@ -165,10 +169,14 @@ function handleRegister() {
       loading.value = true
       register(registerForm.value).then(res => {
         const username = registerForm.value.username
-        ElMessageBox.alert("<font color='red'>恭喜你，您的账号 " + username + " 注册成功！</font>", "系统提示", {
-          dangerouslyUseHTMLString: true,
-          type: "success",
-        }).then(() => {
+        ElMessageBox.alert(
+          "<font color='red'>" + t('register.registerSuccess', { username }) + "</font>", 
+          t('register.registerSuccessTitle'), 
+          {
+            dangerouslyUseHTMLString: true,
+            type: "success",
+          }
+        ).then(() => {
           router.push("/login")
         }).catch(() => {})
       }).catch(() => {

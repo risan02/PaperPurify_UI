@@ -7,9 +7,10 @@
       </div>
       <div class="top-right">
         <div class="user-info">
+          <LanguageSwitcher />
           <el-avatar :size="40" :src="user.avatar" />
           <span class="username">{{ user.name }}</span>
-          <el-button link class="logout-btn" @click="handleLogout">ログアウト</el-button>
+          <el-button link class="logout-btn" @click="handleLogout">{{ $t('common.logout') }}</el-button>
         </div>
       </div>
     </div>
@@ -18,14 +19,14 @@
     <div class="main-content">
       <!-- 初始状态/上传文件 -->
       <div v-if="pageState === 'initial'" class="upload-section">
-        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <h2>{{ $t('aiAnalysis.title') }}</h2>
+        <p>{{ $t('aiAnalysis.description') }}</p>
 
         <div class="upload-area" @click="triggerFileInput">
           <div class="upload-placeholder">
             <el-icon :size="50"><Plus /></el-icon>
-            <p>ファイルを追加するには、クリックするかドラッグ＆ドロップしてください</p>
-            <span>PDF、DOCX形式のファイルをサポートしています。</span>
+            <p>{{ $t('aiAnalysis.uploadHint') }}</p>
+            <span>{{ $t('aiAnalysis.fileTypeSupport') }}</span>
           </div>
           <input
               ref="fileInput"
@@ -42,15 +43,15 @@
               :disabled="!uploadedFile"
               @click="startAnalysis"
           >
-            继续
+            {{ $t('common.continue') }}
           </el-button>
         </div>
       </div>
 
       <!-- 文件已上传状态 -->
       <div v-if="pageState === 'fileUploaded'" class="uploaded-section">
-        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <h2>{{ $t('aiAnalysis.title') }}</h2>
+        <p>{{ $t('aiAnalysis.description') }}</p>
 
         <div class="file-preview">
           <div class="file-card">
@@ -70,26 +71,26 @@
 
       <div class="button-container">
         <el-button class="continue-btn" @click="startAnalysis">
-          继续
+          {{ $t('common.continue') }}
         </el-button>
       </div>
     </div>
 
       <!-- 分析中状态 -->
       <div v-if="pageState === 'analyzing'" class="analyzing-section">
-        <h2>論文のAI成分を浄化し、学術を初心に戻す</h2>
-        <p>AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。</p>
+        <h2>{{ $t('aiAnalysis.title') }}</h2>
+        <p>{{ $t('aiAnalysis.description') }}</p>
 
         <div class="analyzing-area">
           <div class="loading-indicator">
             <div class="red-circle-loader"></div>
-            <p>論文AI成分净化中...</p>
+            <p>{{ $t('aiAnalysis.analyzing') }}</p>
           </div>
         </div>
 
         <div class="button-container">
           <el-button class="continue-btn" disabled>
-            確認して続行
+            {{ $t('aiAnalysis.confirmContinue') }}
           </el-button>
         </div>
     </div>
@@ -99,7 +100,7 @@
         <div class="result-content">
           <div class="ai-probability">
             <!-- 将可能性文本放在饼图上方 -->
-            <h3>本文AI生成の可能性: <span :class="probabilityClass">{{ aiProbabilityText }}</span></h3>
+            <h3>{{ $t('aiAnalysis.aiProbabilityTitle') }}: <span :class="probabilityClass">{{ aiProbabilityText }}</span></h3>
             <div class="probability-chart">
               <div class="chart-container">
                 <div class="chart" ref="chart"></div>
@@ -124,18 +125,18 @@
 
         <div class="button-container">
           <el-button class="back-btn" v-if="canGoBack" @click="goBack">
-            <el-icon><ArrowLeft /></el-icon> 戻る
+            <el-icon><ArrowLeft /></el-icon> {{ $t('common.back') }}
           </el-button>
           <el-button class="continue-btn" @click="switchToDimensions">
-            生成具体评价
+            {{ $t('aiAnalysis.generateSpecificEvaluation') }}
           </el-button>
         </div>
       </div>
 
     <!-- 分析完成状态 - 页面2: 详细评价 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'dimensions'" class="dimensions-section">
-      <h2>詳細評価</h2>
-      <p>論文の質を6つの次元で評価しました</p>
+      <h2>{{ $t('aiAnalysis.detailedEvaluation') }}</h2>
+      <p>{{ $t('aiAnalysis.detailedEvaluationDesc') }}</p>
 
       <div class="radar-chart-container">
         <div class="radar-chart" ref="radarChart"></div>
@@ -152,19 +153,19 @@
 
         <div class="button-container">
           <el-button class="back-btn" @click="goBack">
-            <el-icon><ArrowLeft /></el-icon> 戻る
+            <el-icon><ArrowLeft /></el-icon> {{ $t('common.back') }}
           </el-button>
           <el-button class="continue-btn scroll-btn" @click="switchToRecommendations">
             <el-icon><ArrowDown /></el-icon>
-            下滑展示更多
+            {{ $t('aiAnalysis.scrollForMore') }}
           </el-button>
         </div>
       </div>
 
     <!-- 分析完成状态 - 页面3: 修改建议 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'recommendations'" class="recommendations-section">
-      <h2>修改建议</h2>
-      <p>AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供し、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。</p>
+      <h2>{{ $t('aiAnalysis.modificationSuggestions') }}</h2>
+      <p>{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
 
       <div class="recommendations-content">
         <div class="recommendations-text">
@@ -176,10 +177,10 @@
 
         <div class="button-container">
           <el-button class="back-btn" @click="goBack">
-            <el-icon><ArrowLeft /></el-icon> 戻る
+            <el-icon><ArrowLeft /></el-icon> {{ $t('common.back') }}
           </el-button>
           <el-button class="continue-btn" @click="downloadReport">
-            PDFをエクスポート
+            {{ $t('aiAnalysis.exportPDF') }}
           </el-button>
         </div>
       </div>
@@ -197,16 +198,20 @@ import request from '@/utils/request'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import useUserStore from '@/store/modules/user'
+import { useI18n } from 'vue-i18n'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 // 导入默认头像（所有用户使用相同的固定头像）
 import defaultAvatar from '@/assets/images/default-avatar.svg'
 
 // 获取用户Store实例
 const userStore = useUserStore()
+// 获取i18n实例
+const { t } = useI18n()
 
 // 用户信息 - 使用computed响应式获取，确保userStore更新时自动同步
 // 所有用户使用固定的默认头像
 const user = computed(() => ({
-  name: userStore.nickName || userStore.name || 'ユーザー名',
+  name: userStore.nickName || userStore.name || t('common.username'),
   avatar: defaultAvatar // 使用固定的默认头像
 }))
 
@@ -412,13 +417,13 @@ const handleFileUpload = (event) => {
   // 检查文件类型
   const fileType = file.name.split('.').pop().toLowerCase()
   if (fileType !== 'pdf' && fileType !== 'docx') {
-    ElMessage.error('PDFまたはDOCX形式のファイルのみ対応しています')
+    ElMessage.error(t('aiAnalysis.fileTypeError'))
     return
   }
 
   // 检查文件大小 (最大10MB)
   if (file.size > 10 * 1024 * 1024) {
-    ElMessage.error('ファイルサイズは10MB以下にしてください')
+    ElMessage.error(t('aiAnalysis.fileSizeLimit'))
     return
   }
 
@@ -478,7 +483,7 @@ const startAnalysis = async () => {
     }, 2000)
 
   } catch (error) {
-    ElMessage.error('分析中にエラーが発生しました: ' + error.message)
+    ElMessage.error(t('aiAnalysis.analyzingError') + ': ' + error.message)
     pageState.value = 'fileUploaded'
     addToHistory('fileUploaded')
   }
@@ -553,7 +558,7 @@ const canGoBack = computed(() => {
 const downloadReport = async () => {
   const loading = ElLoading.service({
     lock: true,
-    text: 'PDFを生成中...',
+    text: t('aiAnalysis.generatingPDF'),
     background: 'rgba(0, 0, 0, 0.7)',
   })
 
@@ -564,32 +569,33 @@ const downloadReport = async () => {
     // 添加标题
     doc.setFontSize(20)
     doc.setTextColor(40, 40, 40)
-    doc.text('PaperPurify 分析レポート', 105, 20, { align: 'center' })
+    doc.text(t('aiAnalysis.pdfTitle'), 105, 20, { align: 'center' })
 
     // 添加日期
     doc.setFontSize(12)
     doc.setTextColor(100, 100, 100)
     const now = new Date()
-    doc.text(`生成日: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 105, 30, { align: 'center' })
+    doc.text(`${t('aiAnalysis.pdfGenerationDate')}: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 105, 30, { align: 'center' })
 
     let yPosition = 45
 
     // 1. 添加AI生成可能性部分
     doc.setFontSize(16)
     doc.setTextColor(40, 40, 40)
-    doc.text('AI生成可能性分析', 20, yPosition)
+    doc.text(t('aiAnalysis.aiGenerationPossibilityAnalysis'), 20, yPosition)
     yPosition += 10
 
     doc.setFontSize(14)
-    const aiProbabilityText = analysisResult.value.aiScore >= 70 ? '高い' :
-        analysisResult.value.aiScore >= 40 ? '中' : '低い'
-    doc.text(`本文AI生成の可能性: ${aiProbabilityText} (${analysisResult.value.aiScore}%)`, 20, yPosition)
+    const aiProbabilityText = analysisResult.value.aiScore >= 70 ? t('aiAnalysis.aiProbabilityHigh') :
+        analysisResult.value.aiScore >= 40 ? t('aiAnalysis.aiProbabilityMedium') : t('aiAnalysis.aiProbabilityLow')
+    doc.text(`${t('aiAnalysis.aiProbabilityTitle')}: ${aiProbabilityText} (${analysisResult.value.aiScore}%)`, 20, yPosition)
     yPosition += 15
 
     // 添加AI维度评分表格 - 使用autoTable函数而不是doc.autoTable
+    // 注意：表格内容由后台返回，表格头部使用i18n翻译
     autoTable(doc, {
       startY: yPosition,
-      head: [['評価维度', 'レベル', '評価内容']],
+      head: [[t('aiAnalysis.pdfTableHeadAiDimension'), t('aiAnalysis.pdfTableHeadLevel'), t('aiAnalysis.pdfTableHeadEvaluation')]],
       body: analysisResult.value.aiDimensions.map(d => [
         d.name,
         typeof d.level === 'number' ? d.level.toFixed(1) : d.level,
@@ -621,13 +627,13 @@ const downloadReport = async () => {
     // 2. 添加详细评价部分
     doc.setFontSize(16)
     doc.setTextColor(40, 40, 40)
-    doc.text('詳細評価', 20, yPosition)
+    doc.text(t('aiAnalysis.detailedEvaluation'), 20, yPosition)
     yPosition += 10
 
     // 添加质量维度评分表格 - 使用autoTable函数而不是doc.autoTable
     autoTable(doc, {
       startY: yPosition,
-      head: [['評価维度', 'スコア', '評価内容']],
+      head: [[t('aiAnalysis.pdfTableHeadAiDimension'), t('aiAnalysis.pdfTableHeadScore'), t('aiAnalysis.pdfTableHeadEvaluation')]],
       body: analysisResult.value.qualityDimensions.map(d => [d.name, d.score, d.evaluation]),
       theme: 'grid',
       headStyles: {
@@ -651,7 +657,7 @@ const downloadReport = async () => {
     // 添加雷达图占位说明
     doc.setFontSize(12)
     doc.setTextColor(100, 100, 100)
-    doc.text('※ 詳細なレーダーチャートはWebアプリケーションでご確認ください', 20, yPosition)
+    doc.text(t('aiAnalysis.radarChartNote'), 20, yPosition)
 
     // 添加新页面
     doc.addPage()
@@ -660,12 +666,12 @@ const downloadReport = async () => {
     // 3. 添加修改建议部分
     doc.setFontSize(16)
     doc.setTextColor(40, 40, 40)
-    doc.text('修改建议', 20, yPosition)
+    doc.text(t('aiAnalysis.modificationSuggestions'), 20, yPosition)
     yPosition += 10
 
     doc.setFontSize(12)
     doc.setTextColor(80, 80, 80)
-    doc.text('AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供極、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。', 20, yPosition, { maxWidth: 170 })
+    doc.text(t('aiAnalysis.modificationSuggestionsDesc'), 20, yPosition, { maxWidth: 170 })
     yPosition += 15
 
     // 添加建议列表
@@ -687,17 +693,18 @@ const downloadReport = async () => {
       doc.setPage(i)
       doc.setFontSize(10)
       doc.setTextColor(150, 150, 150)
-      doc.text(`ページ ${i} / ${totalPages}`, 105, 285, { align: 'center' })
-      doc.text('PaperPurify - 論文のAI成分を浄化し、学術を初心に戻す', 105, 290, { align: 'center' })
+      doc.text(`${t('aiAnalysis.page')} ${i} ${t('aiAnalysis.of')} ${totalPages}`, 105, 285, { align: 'center' })
+      doc.text(t('aiAnalysis.pdfFooter'), 105, 290, { align: 'center' })
     }
 
     // 保存PDF
-    doc.save('PaperPurify_分析レポート.pdf')
+    const fileName = t('aiAnalysis.pdfTitle') + '.pdf'
+    doc.save(fileName)
 
-    ElMessage.success('PDFのエクスポートが完了しました')
+    ElMessage.success(t('aiAnalysis.pdfExportSuccess'))
   } catch (error) {
     console.error('PDF导出错误:', error)
-    ElMessage.error('PDFのエクスポート中にエラーが発生しました: ' + error.message)
+    ElMessage.error(t('aiAnalysis.pdfExportError') + ': ' + error.message)
   } finally {
     loading.close()
   }
@@ -705,11 +712,15 @@ const downloadReport = async () => {
 
 // 退出登录
 const handleLogout = () => {
-  ElMessageBox.confirm('确定注销并退出系统吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
+  ElMessageBox.confirm(
+    t('login.loginExpired'), 
+    t('login.systemPrompt'), 
+    {
+      confirmButtonText: t('login.relogin'),
+      cancelButtonText: t('common.cancel'),
+      type: 'warning'
+    }
+  ).then(() => {
     userStore.logOut().then(() => {
       location.href = '/'
     })
@@ -759,9 +770,9 @@ const formatLevel = (level) => {
 
 // 计算AI可能性文本和样式
 const aiProbabilityText = computed(() => {
-  if (analysisResult.value.aiScore >= 70) return '高い'
-  if (analysisResult.value.aiScore >= 40) return '中'
-  return '低い'
+  if (analysisResult.value.aiScore >= 70) return t('aiAnalysis.aiProbabilityHigh')
+  if (analysisResult.value.aiScore >= 40) return t('aiAnalysis.aiProbabilityMedium')
+  return t('aiAnalysis.aiProbabilityLow')
 })
 
 const probabilityClass = computed(() => {
@@ -823,7 +834,12 @@ const router = useRouter()
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+}
+
+/* 语言切换器样式优化 */
+.top-right :deep(.language-trigger) {
+  margin-right: 4px;
 }
 
 .username {
