@@ -163,16 +163,39 @@
 
     <!-- 分析完成状态 - 页面3: 修改建议 -->
     <div v-if="pageState === 'analysisComplete' && resultPage === 'recommendations'" class="recommendations-section">
-      <h2>{{ $t('aiAnalysis.modificationSuggestions') }}</h2>
-      <p>{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
-
-      <div class="recommendations-content">
-        <div class="recommendations-text">
-          <p v-for="(recommendation, index) in analysisResult.recommendations" :key="index">
-            {{ recommendation }}
-          </p>
+      <!-- PDF导出内容区域（隐藏，仅用于导出） -->
+      <div ref="pdfContent" class="pdf-export-content" style="display: none;">
+        <div class="pdf-header">
+          <h1>PaperPurify</h1>
+          <p class="pdf-subtitle">{{ $t('aiAnalysis.pdfTitle') }}</p>
+          <p class="pdf-date">{{ $t('aiAnalysis.pdfGenerationDate') }}: {{ formatDate(new Date()) }}</p>
+        </div>
+        <div class="pdf-body">
+          <h2>{{ $t('aiAnalysis.modificationSuggestions') }}</h2>
+          <p class="pdf-desc">{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
+          <div class="pdf-recommendations">
+            <div v-for="(recommendation, index) in analysisResult.recommendations" :key="index" class="pdf-recommendation-item">
+              <p class="pdf-recommendation-text">{{ index + 1 }}. {{ recommendation }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="pdf-footer">
+          <p>{{ $t('aiAnalysis.pdfFooter') }}</p>
         </div>
       </div>
+
+      <!-- 页面显示内容 -->
+      <div class="recommendations-display">
+        <h2>{{ $t('aiAnalysis.modificationSuggestions') }}</h2>
+        <p>{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
+
+        <div class="recommendations-content">
+          <div class="recommendations-text">
+            <p v-for="(recommendation, index) in analysisResult.recommendations" :key="index">
+              {{ recommendation }}
+            </p>
+          </div>
+        </div>
 
         <div class="button-container">
           <el-button class="back-btn" @click="goBack">
@@ -184,6 +207,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -194,8 +218,8 @@ import { ElMessage, ElLoading, ElMessageBox } from 'element-plus'
 import { Plus, Document, Close, Loading, ArrowDown, ArrowLeft } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import request from '@/utils/request'
+import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import useUserStore from '@/store/modules/user'
 import { useI18n } from 'vue-i18n'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
@@ -222,6 +246,7 @@ const fileInput = ref(null)
 const analysisResult = ref({})
 const chart = ref(null)
 const radarChart = ref(null)
+const pdfContent = ref(null) // PDF导出内容引用
 let chartInstance = null
 let radarChartInstance = null
 
@@ -358,6 +383,7 @@ const initRadarChart = () => {
     radar: {
       indicator: analysisResult.value.qualityDimensions.map(d => ({
         name: d.name,
+        min: 0,
         max: 100
       })),
       shape: 'circle',
@@ -380,7 +406,9 @@ const initRadarChart = () => {
         lineStyle: {
           color: 'rgba(0, 0, 0, 0.2)'
         }
-      }
+      },
+      // 禁用alignTicks以避免警告
+      alignTicks: false
     },
     series: [{
       type: 'radar',
@@ -553,8 +581,24 @@ const canGoBack = computed(() => {
   return pageHistory.value.length > 1
 })
 
-// 下载报告,导出PDF
+// 格式化日期（用于PDF导出）
+const formatDate = (date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+// 下载报告,导出PDF - 仅导出修改建议部分
 const downloadReport = async () => {
+  if (!pdfContent.value) {
+    ElMessage.error('PDF内容未准备好')
+    return
+  }
+
   const loading = ElLoading.service({
     lock: true,
     text: t('aiAnalysis.generatingPDF'),
@@ -562,148 +606,72 @@ const downloadReport = async () => {
   })
 
   try {
+    // 临时显示PDF内容区域
+    pdfContent.value.style.display = 'block'
+    pdfContent.value.style.position = 'absolute'
+    pdfContent.value.style.left = '-9999px'
+    pdfContent.value.style.width = '210mm' // A4宽度
+    pdfContent.value.style.padding = '20mm'
+
+    // 等待DOM更新
+    await nextTick()
+
+    // 使用html2canvas将HTML转换为canvas（支持中文、日文）
+    const canvas = await html2canvas(pdfContent.value, {
+      scale: 2, // 提高清晰度
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: pdfContent.value.scrollWidth,
+      height: pdfContent.value.scrollHeight
+    })
+
+    // 隐藏PDF内容区域
+    pdfContent.value.style.display = 'none'
+    pdfContent.value.style.position = ''
+    pdfContent.value.style.left = ''
+    pdfContent.value.style.width = ''
+    pdfContent.value.style.padding = ''
+
+    // 将canvas转换为图片
+    const imgData = canvas.toDataURL('image/png', 1.0)
+
     // 创建PDF实例
-    const doc = new jsPDF('p', 'mm', 'a4')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const imgWidth = 210 // A4宽度（mm）
+    const imgHeight = (canvas.height * imgWidth) / canvas.width
+    let heightLeft = imgHeight
+    let position = 0
 
-    // 添加标题
-    doc.setFontSize(20)
-    doc.setTextColor(40, 40, 40)
-    doc.text(t('aiAnalysis.pdfTitle'), 105, 20, { align: 'center' })
+    // 添加第一页
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+    heightLeft -= 297 // A4高度（mm）
 
-    // 添加日期
-    doc.setFontSize(12)
-    doc.setTextColor(100, 100, 100)
-    const now = new Date()
-    doc.text(`${t('aiAnalysis.pdfGenerationDate')}: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 105, 30, { align: 'center' })
-
-    let yPosition = 45
-
-    // 1. 添加AI生成可能性部分
-    doc.setFontSize(16)
-    doc.setTextColor(40, 40, 40)
-    doc.text(t('aiAnalysis.aiGenerationPossibilityAnalysis'), 20, yPosition)
-    yPosition += 10
-
-    doc.setFontSize(14)
-    const aiProbabilityText = analysisResult.value.aiScore >= 70 ? t('aiAnalysis.aiProbabilityHigh') :
-        analysisResult.value.aiScore >= 40 ? t('aiAnalysis.aiProbabilityMedium') : t('aiAnalysis.aiProbabilityLow')
-    doc.text(`${t('aiAnalysis.aiProbabilityTitle')}: ${aiProbabilityText} (${analysisResult.value.aiScore}%)`, 20, yPosition)
-    yPosition += 15
-
-    // 添加AI维度评分表格 - 使用autoTable函数而不是doc.autoTable
-    // 注意：表格内容由后台返回，表格头部使用i18n翻译
-    autoTable(doc, {
-      startY: yPosition,
-      head: [[t('aiAnalysis.pdfTableHeadAiDimension'), t('aiAnalysis.pdfTableHeadLevel'), t('aiAnalysis.pdfTableHeadEvaluation')]],
-      body: analysisResult.value.aiDimensions.map(d => [
-        d.name,
-        typeof d.level === 'number' ? d.level.toFixed(1) : d.level,
-        d.evaluation
-      ]),
-      theme: 'grid',
-      headStyles: {
-        fillColor: [40, 40, 40],
-        textColor: 255
-      },
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-        lineColor: [200, 200, 200]
-      },
-      columnStyles: {
-        0: { cellWidth: 40 },
-        1: { cellWidth: 20 },
-        2: { cellWidth: 'auto' }
-      }
-    })
-
-    yPosition = doc.lastAutoTable.finalY + 15
-
-    // 添加新页面
-    doc.addPage()
-    yPosition = 20
-
-    // 2. 添加详细评价部分
-    doc.setFontSize(16)
-    doc.setTextColor(40, 40, 40)
-    doc.text(t('aiAnalysis.detailedEvaluation'), 20, yPosition)
-    yPosition += 10
-
-    // 添加质量维度评分表格 - 使用autoTable函数而不是doc.autoTable
-    autoTable(doc, {
-      startY: yPosition,
-      head: [[t('aiAnalysis.pdfTableHeadAiDimension'), t('aiAnalysis.pdfTableHeadScore'), t('aiAnalysis.pdfTableHeadEvaluation')]],
-      body: analysisResult.value.qualityDimensions.map(d => [d.name, d.score, d.evaluation]),
-      theme: 'grid',
-      headStyles: {
-        fillColor: [40, 40, 40],
-        textColor: 255
-      },
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-        lineColor: [200, 200, 200]
-      },
-      columnStyles: {
-        0: { cellWidth: 45 },
-        1: { cellWidth: 20 },
-        2: { cellWidth: 'auto' }
-      }
-    })
-
-    yPosition = doc.lastAutoTable.finalY + 15
-
-    // 添加雷达图占位说明
-    doc.setFontSize(12)
-    doc.setTextColor(100, 100, 100)
-    doc.text(t('aiAnalysis.radarChartNote'), 20, yPosition)
-
-    // 添加新页面
-    doc.addPage()
-    yPosition = 20
-
-    // 3. 添加修改建议部分
-    doc.setFontSize(16)
-    doc.setTextColor(40, 40, 40)
-    doc.text(t('aiAnalysis.modificationSuggestions'), 20, yPosition)
-    yPosition += 10
-
-    doc.setFontSize(12)
-    doc.setTextColor(80, 80, 80)
-    doc.text(t('aiAnalysis.modificationSuggestionsDesc'), 20, yPosition, { maxWidth: 170 })
-    yPosition += 15
-
-    // 添加建议列表
-    analysisResult.value.recommendations.forEach((rec, index) => {
-      if (yPosition > 250) {
-        doc.addPage()
-        yPosition = 20
-      }
-
-      doc.setFontSize(12)
-      doc.setTextColor(40, 40, 40)
-      doc.text(`${index + 1}. ${rec}`, 25, yPosition, { maxWidth: 160 })
-      yPosition += 20
-    })
-
-    // 添加页脚
-    const totalPages = doc.internal.getNumberOfPages()
-    for (let i = 1; i <= totalPages; i++) {
-      doc.setPage(i)
-      doc.setFontSize(10)
-      doc.setTextColor(150, 150, 150)
-      doc.text(`${t('aiAnalysis.page')} ${i} ${t('aiAnalysis.of')} ${totalPages}`, 105, 285, { align: 'center' })
-      doc.text(t('aiAnalysis.pdfFooter'), 105, 290, { align: 'center' })
+    // 如果内容超过一页，添加新页面
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight
+      pdf.addPage()
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= 297
     }
 
     // 保存PDF
-    const fileName = t('aiAnalysis.pdfTitle') + '.pdf'
-    doc.save(fileName)
+    const fileName = t('aiAnalysis.modificationSuggestions') + '.pdf'
+    pdf.save(fileName)
 
     ElMessage.success(t('aiAnalysis.pdfExportSuccess'))
   } catch (error) {
     console.error('PDF导出错误:', error)
     ElMessage.error(t('aiAnalysis.pdfExportError') + ': ' + error.message)
+    
+    // 确保隐藏PDF内容区域
+    if (pdfContent.value) {
+      pdfContent.value.style.display = 'none'
+      pdfContent.value.style.position = ''
+      pdfContent.value.style.left = ''
+      pdfContent.value.style.width = ''
+      pdfContent.value.style.padding = ''
+    }
   } finally {
     loading.close()
   }
@@ -1349,5 +1317,92 @@ const router = useRouter()
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* PDF导出内容样式 */
+.pdf-export-content {
+  background-color: #ffffff;
+  font-family: 'Microsoft YaHei', 'SimHei', 'Hiragino Sans GB', 'Meiryo', 'MS PGothic', sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.pdf-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.pdf-header h1 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1890ff;
+  margin: 0 0 10px 0;
+}
+
+.pdf-subtitle {
+  font-size: 18px;
+  color: #666;
+  margin: 10px 0;
+}
+
+.pdf-date {
+  font-size: 12px;
+  color: #999;
+  margin: 10px 0 0 0;
+}
+
+.pdf-body {
+  padding: 20px 0;
+}
+
+.pdf-body h2 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.pdf-desc {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  margin: 0 0 30px 0;
+  line-height: 1.8;
+}
+
+.pdf-recommendations {
+  margin-top: 20px;
+}
+
+.pdf-recommendation-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #1890ff;
+  border-radius: 4px;
+}
+
+.pdf-recommendation-text {
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0;
+  color: #333;
+  text-align: justify;
+}
+
+.pdf-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+  text-align: center;
+}
+
+.pdf-footer p {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
 }
 </style>
