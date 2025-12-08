@@ -68,7 +68,14 @@ export default {
     pdfTableHeadLevel: '级别',
     pdfTableHeadEvaluation: '评价内容',
     pdfTableHeadScore: '分数',
-    radarChartScoreName: '评价分数'
+    radarChartScoreName: '评价分数',
+    pdfDocumentName: '文档名称',
+    pdfAiGenerationTrace: 'AI生成痕迹分析',
+    pdfDocumentQuality: '文档质量分析',
+    pdfAiScore: 'AI生成可能性评分',
+    pdfAiDimensionsTitle: 'AI生成痕迹六大维度',
+    pdfQualityDimensionsTitle: '文档质量六大维度',
+    pdfScoreUnit: '分'
   },
   login: {
     title: '登录',

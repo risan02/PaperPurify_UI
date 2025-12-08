@@ -68,7 +68,14 @@ export default {
     pdfTableHeadLevel: 'レベル',
     pdfTableHeadEvaluation: '評価内容',
     pdfTableHeadScore: 'スコア',
-    radarChartScoreName: '評価スコア'
+    radarChartScoreName: '評価スコア',
+    pdfDocumentName: '文書名',
+    pdfAiGenerationTrace: 'AI生成痕跡分析',
+    pdfDocumentQuality: '文書品質分析',
+    pdfAiScore: 'AI生成可能性スコア',
+    pdfAiDimensionsTitle: 'AI生成痕跡6大次元',
+    pdfQualityDimensionsTitle: '文書品質6大次元',
+    pdfScoreUnit: '点'
   },
   login: {
     title: 'ログイン',

@@ -170,15 +170,69 @@
           <p class="pdf-subtitle">{{ $t('aiAnalysis.pdfTitle') }}</p>
           <p class="pdf-date">{{ $t('aiAnalysis.pdfGenerationDate') }}: {{ formatDate(new Date()) }}</p>
         </div>
+        
         <div class="pdf-body">
-          <h2>{{ $t('aiAnalysis.modificationSuggestions') }}</h2>
-          <p class="pdf-desc">{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
-          <div class="pdf-recommendations">
-            <div v-for="(recommendation, index) in analysisResult.recommendations" :key="index" class="pdf-recommendation-item">
-              <p class="pdf-recommendation-text">{{ index + 1 }}. {{ recommendation }}</p>
+          <!-- 文档名称 -->
+          <div class="pdf-section">
+            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfDocumentName') }}</div>
+            <div class="pdf-document-name">{{ uploadedFile?.name || '-' }}</div>
+          </div>
+
+          <!-- AI生成可能性评分 -->
+          <div class="pdf-section" v-if="analysisResult.aiScore !== undefined && analysisResult.aiScore !== null">
+            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfAiScore') }}</div>
+            <div class="pdf-score-box">
+              <div class="pdf-score-value">{{ analysisResult.aiScore }}%</div>
+              <div class="pdf-score-label" :class="getProbabilityClassForPDF(analysisResult.aiScore)">
+                {{ getProbabilityTextForPDF(analysisResult.aiScore) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- AI生成痕迹六大维度 -->
+          <div class="pdf-section" v-if="analysisResult.aiDimensions && analysisResult.aiDimensions.length > 0">
+            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfAiDimensionsTitle') }}</div>
+            <div class="pdf-dimensions-list">
+              <div v-for="(dimension, index) in analysisResult.aiDimensions" :key="index" class="pdf-dimension-item">
+                <div class="pdf-dimension-header">
+                  <span class="pdf-dimension-name">{{ dimension.name }}</span>
+                  <span class="pdf-dimension-level" :class="getLevelClass(dimension.level)">
+                    {{ formatLevel(dimension.level) }}
+                  </span>
+                </div>
+                <div class="pdf-dimension-evaluation">{{ dimension.evaluation }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 文档质量六大维度 -->
+          <div class="pdf-section" v-if="analysisResult.qualityDimensions && analysisResult.qualityDimensions.length > 0">
+            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfQualityDimensionsTitle') }}</div>
+            <div class="pdf-dimensions-list">
+              <div v-for="(dimension, index) in analysisResult.qualityDimensions" :key="index" class="pdf-dimension-item">
+                <div class="pdf-dimension-header">
+                  <span class="pdf-dimension-name">{{ dimension.name }}</span>
+                  <span class="pdf-quality-score" :class="getQualityScoreClass(dimension.score)">
+                    {{ dimension.score }}{{ $t('aiAnalysis.pdfScoreUnit') }}
+                  </span>
+                </div>
+                <div class="pdf-dimension-evaluation">{{ dimension.evaluation }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 修改建议 -->
+          <div class="pdf-section" v-if="analysisResult.recommendations && analysisResult.recommendations.length > 0">
+            <div class="pdf-section-title">{{ $t('aiAnalysis.modificationSuggestions') }}</div>
+            <p class="pdf-desc">{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
+            <div class="pdf-recommendations">
+              <div v-for="(recommendation, index) in analysisResult.recommendations" :key="index" class="pdf-recommendation-item">
+                <p class="pdf-recommendation-text">{{ index + 1 }}. {{ recommendation }}</p>
+              </div>
             </div>
           </div>
         </div>
+
         <div class="pdf-footer">
           <p>{{ $t('aiAnalysis.pdfFooter') }}</p>
         </div>
@@ -243,7 +297,12 @@ const pageState = ref('initial')
 const resultPage = ref('probability') // probability, dimensions, recommendations
 const uploadedFile = ref(null)
 const fileInput = ref(null)
-const analysisResult = ref({})
+const analysisResult = ref({
+  aiScore: null,
+  aiDimensions: [],
+  qualityDimensions: [],
+  recommendations: []
+})
 const chart = ref(null)
 const radarChart = ref(null)
 const pdfContent = ref(null) // PDF导出内容引用
@@ -592,10 +651,39 @@ const formatDate = (date) => {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
-// 下载报告,导出PDF - 仅导出修改建议部分
+const getProbabilityTextForPDF = (score) => {
+  if (score >= 70) return t('aiAnalysis.aiProbabilityHigh')
+  if (score >= 40) return t('aiAnalysis.aiProbabilityMedium')
+  return t('aiAnalysis.aiProbabilityLow')
+}
+
+const getProbabilityClassForPDF = (score) => {
+  if (score >= 70) return 'pdf-score-high'
+  if (score >= 40) return 'pdf-score-medium'
+  return 'pdf-score-low'
+}
+
+const getQualityScoreClass = (score) => {
+  if (score >= 85) return 'pdf-quality-high'
+  if (score >= 70) return 'pdf-quality-medium'
+  return 'pdf-quality-low'
+}
+
+// 下载报告,导出PDF
 const downloadReport = async () => {
   if (!pdfContent.value) {
     ElMessage.error('PDF内容未准备好')
+    return
+  }
+
+  if (!analysisResult.value || Object.keys(analysisResult.value).length === 0) {
+    ElMessage.error(t('aiAnalysis.analyzingError') + ': ' + '分析数据不存在，请先完成分析')
+    return
+  }
+
+  // 确保uploadedFile存在，避免模板中访问undefined
+  if (!uploadedFile.value) {
+    ElMessage.error('文档信息不存在，无法导出PDF')
     return
   }
 
@@ -610,11 +698,15 @@ const downloadReport = async () => {
     pdfContent.value.style.display = 'block'
     pdfContent.value.style.position = 'absolute'
     pdfContent.value.style.left = '-9999px'
+    pdfContent.value.style.top = '0'
     pdfContent.value.style.width = '210mm' // A4宽度
     pdfContent.value.style.padding = '20mm'
+    pdfContent.value.style.boxSizing = 'border-box'
+    pdfContent.value.style.overflow = 'visible'
 
-    // 等待DOM更新
+    // 等待DOM更新和字体加载
     await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 500)) // 等待字体渲染
 
     // 使用html2canvas将HTML转换为canvas（支持中文、日文）
     const canvas = await html2canvas(pdfContent.value, {
@@ -623,36 +715,155 @@ const downloadReport = async () => {
       logging: false,
       backgroundColor: '#ffffff',
       width: pdfContent.value.scrollWidth,
-      height: pdfContent.value.scrollHeight
+      height: pdfContent.value.scrollHeight,
+      windowWidth: pdfContent.value.scrollWidth,
+      windowHeight: pdfContent.value.scrollHeight,
+      allowTaint: false,
+      removeContainer: false,
+      imageTimeout: 15000,
+      onclone: (clonedDoc) => {
+        // 确保克隆的文档中字体正确加载
+        const clonedElement = clonedDoc.querySelector('.pdf-export-content')
+        if (clonedElement) {
+          clonedElement.style.fontFamily = "'Microsoft YaHei', 'SimHei', 'Hiragino Sans GB', 'Meiryo', 'MS PGothic', sans-serif"
+        }
+      }
     })
+
+    // 检查canvas是否创建成功
+    if (!canvas || !canvas.width || !canvas.height) {
+      throw new Error('Canvas创建失败，无法生成PDF')
+    }
 
     // 隐藏PDF内容区域
     pdfContent.value.style.display = 'none'
     pdfContent.value.style.position = ''
     pdfContent.value.style.left = ''
+    pdfContent.value.style.top = ''
     pdfContent.value.style.width = ''
     pdfContent.value.style.padding = ''
-
-    // 将canvas转换为图片
-    const imgData = canvas.toDataURL('image/png', 1.0)
+    pdfContent.value.style.boxSizing = ''
+    pdfContent.value.style.overflow = ''
 
     // 创建PDF实例
     const pdf = new jsPDF('p', 'mm', 'a4')
-    const imgWidth = 210 // A4宽度（mm）
+    const pageWidth = 210 // A4宽度（mm）
+    const pageHeight = 297 // A4高度（mm）
+    const marginTop = 15 // 上边距（为页眉留空间）
+    const marginBottom = 20 // 下边距（为页脚留空间）
+    const contentHeight = pageHeight - marginTop - marginBottom // 可用内容高度
+    
+    // 计算图片尺寸
+    const imgWidth = pageWidth
     const imgHeight = (canvas.height * imgWidth) / canvas.width
-    let heightLeft = imgHeight
-    let position = 0
+    const totalPages = Math.ceil(imgHeight / contentHeight)
+    
+    // 添加页眉页脚函数
+    const addHeaderFooter = (pageNum, totalPages) => {
+      // 页眉线
+      pdf.setDrawColor(200, 200, 200)
+      pdf.setLineWidth(0.5)
+      pdf.line(10, marginTop - 5, pageWidth - 10, marginTop - 5)
+      
+      // 页眉文字
+      pdf.setFontSize(10)
+      pdf.setTextColor(100, 100, 100)
+      pdf.text('PaperPurify', 15, marginTop - 2)
+      
+      // 页码
+      const pageText = `${pageNum} / ${totalPages}`
+      const pageTextWidth = pdf.getTextWidth(pageText)
+      pdf.text(pageText, pageWidth - 15 - pageTextWidth, marginTop - 2)
+      
+      // 页脚线
+      pdf.setDrawColor(200, 200, 200)
+      pdf.line(10, pageHeight - marginBottom + 5, pageWidth - 10, pageHeight - marginBottom + 5)
+      
+      // 页脚文字（只使用英文，避免中文乱码）
+      pdf.setFontSize(9)
+      pdf.setTextColor(150, 150, 150)
+      const footerText = 'PaperPurify'
+      const footerTextWidth = pdf.getTextWidth(footerText)
+      pdf.text(footerText, (pageWidth - footerTextWidth) / 2, pageHeight - marginBottom + 2)
+    }
 
-    // 添加第一页
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-    heightLeft -= 297 // A4高度（mm）
+    // 创建临时canvas用于裁剪每一页
+    const tempCanvas = document.createElement('canvas')
+    const tempCtx = tempCanvas.getContext('2d')
+    
+    if (!tempCtx) {
+      throw new Error('无法创建临时canvas上下文')
+    }
+    
+    tempCanvas.width = canvas.width
+    const pageHeightInPixels = Math.ceil(contentHeight * canvas.width / pageWidth)
+    tempCanvas.height = pageHeightInPixels
 
-    // 如果内容超过一页，添加新页面
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight
-      pdf.addPage()
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-      heightLeft -= 297
+    // 分页添加内容
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      if (pageNum > 1) {
+        pdf.addPage()
+      }
+      
+      // 计算当前页要裁剪的内容位置（像素）
+      const sourceY = Math.floor((pageNum - 1) * pageHeightInPixels)
+      const remainingHeight = canvas.height - sourceY
+      const sourceHeight = Math.min(pageHeightInPixels, remainingHeight)
+      
+      if (sourceHeight <= 0) {
+        break // 没有更多内容了
+      }
+      
+      // 调整临时canvas高度以匹配实际内容
+      if (sourceHeight < pageHeightInPixels) {
+        tempCanvas.height = sourceHeight
+      }
+      
+      // 清空临时canvas
+      tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height)
+      
+      // 设置高质量渲染
+      tempCtx.imageSmoothingEnabled = true
+      tempCtx.imageSmoothingQuality = 'high'
+      
+      // 裁剪当前页的内容到临时canvas
+      try {
+        tempCtx.drawImage(
+          canvas,
+          0, sourceY, canvas.width, sourceHeight,
+          0, 0, canvas.width, sourceHeight
+        )
+      } catch (err) {
+        console.error('绘制图片到临时canvas失败:', err)
+        throw new Error('图片处理失败: ' + err.message)
+      }
+      
+      // 将裁剪后的内容转换为图片
+      const pageImgData = tempCanvas.toDataURL('image/png', 1.0)
+      const pageImgHeight = (sourceHeight * imgWidth) / canvas.width
+      
+      // 添加图片到PDF
+      pdf.addImage(
+        pageImgData,
+        'PNG',
+        0,
+        marginTop,
+        imgWidth,
+        pageImgHeight
+      )
+      
+      // 添加页眉页脚
+      addHeaderFooter(pageNum, totalPages)
+      
+      // 如果不是最后一页，添加分页装饰线
+      if (pageNum < totalPages) {
+        pdf.setDrawColor(220, 220, 220)
+        pdf.setLineWidth(0.5)
+        pdf.line(25, pageHeight - marginBottom - 3, pageWidth - 25, pageHeight - marginBottom - 3)
+      }
+      
+      // 恢复临时canvas高度
+      tempCanvas.height = pageHeightInPixels
     }
 
     // 保存PDF
@@ -1325,6 +1536,11 @@ const router = useRouter()
   font-family: 'Microsoft YaHei', 'SimHei', 'Hiragino Sans GB', 'Meiryo', 'MS PGothic', sans-serif;
   color: #333;
   line-height: 1.6;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .pdf-header {
@@ -1357,32 +1573,179 @@ const router = useRouter()
   padding: 20px 0;
 }
 
-.pdf-body h2 {
-  font-size: 22px;
+.pdf-section {
+  margin-bottom: 35px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  -webkit-region-break-inside: avoid;
+}
+
+.pdf-section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1890ff;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.pdf-document-name {
+  font-size: 16px;
+  color: #333;
+  padding: 12px 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.pdf-score-box {
+  text-align: center;
+  padding: 25px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+  margin: 15px 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  -webkit-region-break-inside: avoid;
+}
+
+.pdf-score-value {
+  font-size: 48px;
   font-weight: bold;
   color: #333;
-  margin: 0 0 15px 0;
-  text-align: center;
+  margin-bottom: 10px;
+}
+
+.pdf-score-label {
+  font-size: 18px;
+  font-weight: 500;
+  padding: 6px 20px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.pdf-score-high {
+  background-color: #f56c6c;
+  color: #fff;
+}
+
+.pdf-score-medium {
+  background-color: #e6a23c;
+  color: #fff;
+}
+
+.pdf-score-low {
+  background-color: #67c23a;
+  color: #fff;
+}
+
+.pdf-dimensions-list {
+  margin-top: 15px;
+}
+
+.pdf-dimension-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  -webkit-region-break-inside: avoid;
+}
+
+.pdf-dimension-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.pdf-dimension-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.pdf-dimension-level {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-left: 15px;
+}
+
+.pdf-dimension-level.level-high {
+  background-color: #67c23a;
+  color: #fff;
+}
+
+.pdf-dimension-level.level-medium {
+  background-color: #e6a23c;
+  color: #fff;
+}
+
+.pdf-dimension-level.level-low {
+  background-color: #f56c6c;
+  color: #fff;
+}
+
+.pdf-quality-score {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-left: 15px;
+}
+
+.pdf-quality-high {
+  background-color: #67c23a;
+  color: #fff;
+}
+
+.pdf-quality-medium {
+  background-color: #e6a23c;
+  color: #fff;
+}
+
+.pdf-quality-low {
+  background-color: #f56c6c;
+  color: #fff;
+}
+
+.pdf-dimension-evaluation {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.8;
+  text-align: justify;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .pdf-desc {
   font-size: 14px;
   color: #666;
-  text-align: center;
-  margin: 0 0 30px 0;
+  margin: 0 0 20px 0;
   line-height: 1.8;
 }
 
 .pdf-recommendations {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .pdf-recommendation-item {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   padding: 15px;
   background-color: #f9f9f9;
   border-left: 4px solid #1890ff;
   border-radius: 4px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  -webkit-region-break-inside: avoid;
 }
 
 .pdf-recommendation-text {
@@ -1391,6 +1754,9 @@ const router = useRouter()
   margin: 0;
   color: #333;
   text-align: justify;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .pdf-footer {
