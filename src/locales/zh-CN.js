@@ -67,7 +67,8 @@ export default {
     pdfTableHeadAiDimension: '评价维度',
     pdfTableHeadLevel: '级别',
     pdfTableHeadEvaluation: '评价内容',
-    pdfTableHeadScore: '分数'
+    pdfTableHeadScore: '分数',
+    radarChartScoreName: '评价分数'
   },
   login: {
     title: '登录',

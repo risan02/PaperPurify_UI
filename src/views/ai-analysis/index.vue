@@ -387,7 +387,7 @@ const initRadarChart = () => {
       type: 'radar',
       data: [{
         value: analysisResult.value.qualityDimensions.map(d => d.score),
-        name: '評価スコア',
+        name: t('aiAnalysis.radarChartScoreName'),
         areaStyle: {
           color: 'rgba(24, 144, 255, 0.6)'
         },

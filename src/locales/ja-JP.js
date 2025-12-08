@@ -47,10 +47,10 @@ export default {
     aiProbabilityHigh: '高い',
     aiProbabilityMedium: '中',
     aiProbabilityLow: '低い',
-    generateSpecificEvaluation: '生成具体评价',
+    generateSpecificEvaluation: '具体的評価を生成',
     detailedEvaluation: '詳細評価',
     detailedEvaluationDesc: '論文の質を6つの次元で評価しました',
-    scrollForMore: '下滑展示更多',
+    scrollForMore: '下にスクロールして詳細を表示',
     modificationSuggestions: '修正提案',
     modificationSuggestionsDesc: 'AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供し、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。',
     exportPDF: 'PDFをエクスポート',
@@ -64,10 +64,11 @@ export default {
     pdfTitle: 'PaperPurify 分析レポート',
     pdfGenerationDate: '生成日',
     pdfFooter: 'PaperPurify - 論文のAI成分を浄化し、学術を初心に戻す',
-    pdfTableHeadAiDimension: '評価维度',
+    pdfTableHeadAiDimension: '評価次元',
     pdfTableHeadLevel: 'レベル',
     pdfTableHeadEvaluation: '評価内容',
-    pdfTableHeadScore: 'スコア'
+    pdfTableHeadScore: 'スコア',
+    radarChartScoreName: '評価スコア'
   },
   login: {
     title: 'ログイン',
