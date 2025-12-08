@@ -146,7 +146,6 @@
         <div class="quality-dimension" v-for="(dimension, index) in analysisResult.qualityDimensions" :key="index">
           <h4>{{ dimension.name }}</h4>
           <el-progress :percentage="dimension.score" :color="getQualityScoreColor(dimension.score)" />
-          <span class="score-value">{{ dimension.score }}/100</span>
           <p class="dimension-evaluation">{{ dimension.evaluation }}</p>
         </div>
       </div>

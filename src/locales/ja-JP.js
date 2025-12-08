@@ -51,7 +51,7 @@ export default {
     detailedEvaluation: '詳細評価',
     detailedEvaluationDesc: '論文の質を6つの次元で評価しました',
     scrollForMore: '下にスクロールして詳細を表示',
-    modificationSuggestions: '修正提案',
+    modificationSuggestions: '修正の提案',
     modificationSuggestionsDesc: 'AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供し、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。',
     exportPDF: 'PDFをエクスポート',
     generatingPDF: 'PDFを生成中...',
