@@ -739,7 +739,6 @@ const downloadReport = async () => {
     pdfContent.value.style.display = 'none'
     pdfContent.value.style.position = ''
     pdfContent.value.style.left = ''
-    pdfContent.value.style.top = ''
     pdfContent.value.style.width = ''
     pdfContent.value.style.padding = ''
     pdfContent.value.style.boxSizing = ''
@@ -891,10 +890,10 @@ const downloadReport = async () => {
 // 退出登录
 const handleLogout = () => {
   ElMessageBox.confirm(
-    t('login.loginExpired'), 
-    t('login.systemPrompt'), 
+    t('login.logoutConfirm'),  // 修改：使用新的翻译键
+    t('login.logoutTitle'),  // 修改：使用新的翻译键
     {
-      confirmButtonText: t('login.relogin'),
+      confirmButtonText: t('common.confirm'),  // 修改：确认按钮文本
       cancelButtonText: t('common.cancel'),
       type: 'warning'
     }

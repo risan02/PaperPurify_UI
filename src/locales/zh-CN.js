@@ -4,10 +4,10 @@
 export default {
   common: {
     language: '语言',
-    logout: '退出登录',
+    logout: '退出',  // 修改：从'退出登录'改为'退出'
     continue: '继续',
     back: '返回',
-    confirm: '确认',
+    confirm: '确认',  // 登出确认按钮使用
     cancel: '取消',
     submit: '提交',
     save: '保存',
@@ -33,8 +33,8 @@ export default {
     info: '守护学术的纯粹性'
   },
   aiAnalysis: {
-    title: '净化论文AI成分，回归学术初心',
-    description: '让AI的影子无处隐藏，让原创的光芒闪耀。',
+    title: '让文字回到它本来的样子',  // 修改：大标语
+    description: '一款清晰、透明、可落地的文书检测工具',  // 修改：小标语
     uploadHint: '点击或拖放以添加文件',
     fileTypeSupport: '支持PDF、DOCX格式的文件。',
     fileSizeLimit: '文件大小请控制在10MB以下',
@@ -47,11 +47,11 @@ export default {
     aiProbabilityHigh: '高',
     aiProbabilityMedium: '中',
     aiProbabilityLow: '低',
-    generateSpecificEvaluation: '生成具体评价',
+    generateSpecificEvaluation: '具体评价',  // 修改：从'生成具体评价'改为'具体评价'
     detailedEvaluation: '详细评价',
     detailedEvaluationDesc: '从6个维度评估了论文的质量',
-    scrollForMore: '向下滚动查看更多',
-    modificationSuggestions: '修改建议',
+    scrollForMore: '详细',  // 修改：从'向下滚动查看更多'改为'详细'
+    modificationSuggestions: '修改建议',  // 保持不变（中文本来就是'修改建议'）
     modificationSuggestionsDesc: '基于AI分析结果，提供具体可行的论文修改建议，有效降低AI比例，提升论文质量。',
     exportPDF: '导出PDF',
     generatingPDF: '正在生成PDF...',
@@ -81,7 +81,7 @@ export default {
     title: '登录',
     loginButton: '登录',
     loggingIn: '登录中...',
-    registerButton: '注册',
+    registerButton: '注册',  // 登录页面的注册按钮
     rememberPassword: '记住密码',
     usernamePlaceholder: '账号',
     passwordPlaceholder: '密码',
@@ -91,7 +91,9 @@ export default {
     loginExpired: '登录状态已过期，您可以继续留在该页面，或者重新登录',
     systemPrompt: '系统提示',
     relogin: '重新登录',
-    invalidSession: '无效的会话，或者会话已过期，请重新登录。'
+    invalidSession: '无效的会话，或者会话已过期，请重新登录。',
+    logoutConfirm: '操作确认: 退出后本次結果将无法找回。',  // 新增：登出确认消息
+    logoutTitle: '退出'  // 新增：登出对话框标题
   },
   register: {
     title: '注册',

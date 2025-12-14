@@ -33,8 +33,8 @@ export default {
     info: '学術の純粋性を守る'
   },
   aiAnalysis: {
-    title: '論文のAI成分を浄化し、学術を初心に戻す',
-    description: 'AIの影がどこにも隠れられないようにし、オリジナルの光を輝かせよう。',
+    title: 'あなたの言葉を、AIのノイズから解放する',
+    description: 'AI率 × 多次元スコアリングで、志望理由書の純度・信頼性・説得力を可視化',
     uploadHint: 'ファイルを追加するには、クリックするかドラッグ＆ドロップしてください',
     fileTypeSupport: 'PDF、DOCX形式のファイルをサポートしています。',
     fileSizeLimit: 'ファイルサイズは10MB以下にしてください',
@@ -47,11 +47,11 @@ export default {
     aiProbabilityHigh: '高い',
     aiProbabilityMedium: '中',
     aiProbabilityLow: '低い',
-    generateSpecificEvaluation: '具体的評価を生成',
+    generateSpecificEvaluation: '具体的評価へ',
     detailedEvaluation: '詳細評価',
     detailedEvaluationDesc: '論文の質を6つの次元で評価しました',
-    scrollForMore: '下にスクロールして詳細を表示',
-    modificationSuggestions: '修正の提案',
+    scrollForMore: '詳細へ',  // 修改：从'下にスクロールして詳細を表示'改为'詳細へ'
+    modificationSuggestions: '修正提案',
     modificationSuggestionsDesc: 'AI分析結果に基づき、具体的で実行可能な論文の修正提案を提供し、AI比率を効果的に下げ、論文の質を向上させるお手伝いをします。',
     exportPDF: 'PDFをエクスポート',
     generatingPDF: 'PDFを生成中...',
@@ -81,7 +81,7 @@ export default {
     title: 'ログイン',
     loginButton: 'ログイン',
     loggingIn: 'ログイン中...',
-    registerButton: '登録',
+    registerButton: '新規登録',
     rememberPassword: 'パスワードを記憶する',
     usernamePlaceholder: 'アカウント',
     passwordPlaceholder: 'パスワード',
@@ -91,7 +91,9 @@ export default {
     loginExpired: 'ログイン状態が期限切れです。このページに留まるか、再ログインしてください',
     systemPrompt: 'システムプロンプト',
     relogin: '再ログイン',
-    invalidSession: '無効なセッション、またはセッションが期限切れです。再ログインしてください。'
+    invalidSession: '無効なセッション、またはセッションが期限切れです。再ログインしてください。',
+    logoutConfirm: '操作確認: 退出すると今回の結果は復元できません。',
+    logoutTitle: 'ログアウト'
   },
   register: {
     title: '新規登録',

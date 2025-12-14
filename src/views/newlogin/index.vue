@@ -70,7 +70,7 @@
 
           <el-form-item>
             <el-button class="register-btn" @click.prevent="handleRegister">
-              {{ $t('common.register') }}
+              {{ $t('login.registerButton') }}
             </el-button>
           </el-form-item>
         </el-form>
