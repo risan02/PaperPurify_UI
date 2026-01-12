@@ -30,17 +30,17 @@ export default {
     alreadyHaveAccount: '已有账号？',
     termsOfService: '使用条款',
     privacyPolicy: '隐私政策',
-    info: '守护学术的纯粹性'
+    info: '解决提交前的风险和不安'
   },
   aiAnalysis: {
-    title: '让文字回到它本来的样子',  // 修改：大标语
-    description: '一款清晰、透明、可落地的文书检测工具',  // 修改：小标语
-    uploadHint: '点击或拖放以添加文件',
+    title: 'PaperPurify｜留学生文书辅助工具',  // 修改：大标语
+    description: '让留学生的志望理由书写得更自然、更有说服力。',  // 修改：小标语
+    uploadHint: '点击或拖放以添加志望理由书',
     fileTypeSupport: '支持PDF、DOCX格式的文件。',
     fileSizeLimit: '文件大小请控制在10MB以下',
     fileTypeError: '仅支持PDF或DOCX格式的文件',
     uploadError: '文件上传过程中发生错误',
-    analyzing: '论文AI成分净化中...',
+    analyzing: 'Loading...',
     analyzingError: '分析过程中发生错误',
     confirmContinue: '确认并继续',
     aiProbabilityTitle: '本文AI生成的可能性',

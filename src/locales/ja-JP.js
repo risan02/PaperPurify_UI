@@ -30,17 +30,17 @@ export default {
     alreadyHaveAccount: 'すでにアカウントをお持ちですか？',
     termsOfService: '利用規約',
     privacyPolicy: 'プライバシーポリシー',
-    info: '学術の純粋性を守る'
+    info: '提出前の不安をゼロへ。'
   },
   aiAnalysis: {
-    title: 'あなたの言葉を、AIのノイズから解放する',
-    description: 'AI率 × 多次元スコアリングで、志望理由書の純度・信頼性・説得力を可視化',
-    uploadHint: 'ファイルを追加するには、クリックするかドラッグ＆ドロップしてください',
+    title: 'PaperPurify｜留学生のための志望理由書サポートツール',
+    description: '学生の志望理由書を、もっと自然に、もっと伝わる文章へ。',
+    uploadHint: '志望理由書をアップロードしてください。',
     fileTypeSupport: 'PDF、DOCX形式のファイルをサポートしています。',
     fileSizeLimit: 'ファイルサイズは10MB以下にしてください',
     fileTypeError: 'PDFまたはDOCX形式のファイルのみ対応しています',
     uploadError: 'ファイルのアップロード中にエラーが発生しました',
-    analyzing: '論文AI成分净化中...',
+    analyzing: 'Loading...',
     analyzingError: '分析中にエラーが発生しました',
     confirmContinue: '確認して続行',
     aiProbabilityTitle: '本文AI生成の可能性',

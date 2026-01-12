@@ -21,7 +21,7 @@
         >
           <span class="language-item">
             <el-icon v-if="currentLocale === 'zh-CN'" class="check-icon"><Check /></el-icon>
-            <span :class="{ 'selected-text': currentLocale === 'zh-CN' }">中文</span>
+            <span :class="{ 'selected-text': currentLocale === 'zh-CN' }">简体中文</span>
           </span>
         </el-dropdown-item>
       </el-dropdown-menu>
