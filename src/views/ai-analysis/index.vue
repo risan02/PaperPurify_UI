@@ -69,12 +69,12 @@
           </div>
         </div>
 
-      <div class="button-container">
-        <el-button class="continue-btn" @click="startAnalysis">
-          {{ $t('common.continue') }}
-        </el-button>
+        <div class="button-container">
+          <el-button class="continue-btn" @click="startAnalysis">
+            {{ $t('common.continue') }}
+          </el-button>
+        </div>
       </div>
-    </div>
 
       <!-- 分析中状态 -->
       <div v-if="pageState === 'analyzing'" class="analyzing-section">
@@ -93,10 +93,10 @@
             {{ $t('aiAnalysis.confirmContinue') }}
           </el-button>
         </div>
-    </div>
+      </div>
 
-    <!-- 分析完成状态 - 页面1: AI生成可能性 -->
-    <div v-if="pageState === 'analysisComplete' && resultPage === 'probability'" class="result-section">
+      <!-- 分析完成状态 - 页面1: AI生成可能性 -->
+      <div v-if="pageState === 'analysisComplete' && resultPage === 'probability'" class="result-section">
         <div class="result-content">
           <div class="ai-probability">
             <!-- 将可能性文本放在饼图上方 -->
@@ -133,22 +133,22 @@
         </div>
       </div>
 
-    <!-- 分析完成状态 - 页面2: 详细评价 -->
-    <div v-if="pageState === 'analysisComplete' && resultPage === 'dimensions'" class="dimensions-section">
-      <h2>{{ $t('aiAnalysis.detailedEvaluation') }}</h2>
-      <p>{{ $t('aiAnalysis.detailedEvaluationDesc') }}</p>
+      <!-- 分析完成状态 - 页面2: 详细评价 -->
+      <div v-if="pageState === 'analysisComplete' && resultPage === 'dimensions'" class="dimensions-section">
+        <h2>{{ $t('aiAnalysis.detailedEvaluation') }}</h2>
+        <p>{{ $t('aiAnalysis.detailedEvaluationDesc') }}</p>
 
-      <div class="radar-chart-container">
-        <div class="radar-chart" ref="radarChart"></div>
-      </div>
-
-      <div class="quality-dimensions">
-        <div class="quality-dimension" v-for="(dimension, index) in analysisResult.qualityDimensions" :key="index">
-          <h4>{{ dimension.name }}</h4>
-          <el-progress :percentage="dimension.score" :color="getQualityScoreColor(dimension.score)" />
-          <p class="dimension-evaluation">{{ dimension.evaluation }}</p>
+        <div class="radar-chart-container">
+          <div class="radar-chart" ref="radarChart"></div>
         </div>
-      </div>
+
+        <div class="quality-dimensions">
+          <div class="quality-dimension" v-for="(dimension, index) in analysisResult.qualityDimensions" :key="index">
+            <h4>{{ dimension.name }}</h4>
+            <el-progress :percentage="dimension.score" :color="getQualityScoreColor(dimension.score)" />
+            <p class="dimension-evaluation">{{ dimension.evaluation }}</p>
+          </div>
+        </div>
 
         <div class="button-container">
           <el-button class="back-btn" @click="goBack">
@@ -161,106 +161,106 @@
         </div>
       </div>
 
-    <!-- 分析完成状态 - 页面3: 修改建议 -->
-    <div v-if="pageState === 'analysisComplete' && resultPage === 'recommendations'" class="recommendations-section">
-      <!-- PDF导出内容区域（隐藏，仅用于导出） -->
-      <div ref="pdfContent" class="pdf-export-content" style="display: none;">
-        <div class="pdf-header">
-          <h1>PaperPurify</h1>
-          <p class="pdf-subtitle">{{ $t('aiAnalysis.pdfTitle') }}</p>
-          <p class="pdf-date">{{ $t('aiAnalysis.pdfGenerationDate') }}: {{ formatDate(new Date()) }}</p>
-        </div>
-        
-        <div class="pdf-body">
-          <!-- 文档名称 -->
-          <div class="pdf-section">
-            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfDocumentName') }}</div>
-            <div class="pdf-document-name">{{ uploadedFile?.name || '-' }}</div>
+      <!-- 分析完成状态 - 页面3: 修改建议 -->
+      <div v-if="pageState === 'analysisComplete' && resultPage === 'recommendations'" class="recommendations-section">
+        <!-- PDF导出内容区域（隐藏，仅用于导出） -->
+        <div ref="pdfContent" class="pdf-export-content" style="display: none;">
+          <div class="pdf-header">
+            <h1>PaperPurify</h1>
+            <p class="pdf-subtitle">{{ $t('aiAnalysis.pdfTitle') }}</p>
+            <p class="pdf-date">{{ $t('aiAnalysis.pdfGenerationDate') }}: {{ formatDate(new Date()) }}</p>
           </div>
 
-          <!-- AI生成可能性评分 -->
-          <div class="pdf-section" v-if="analysisResult.aiScore !== undefined && analysisResult.aiScore !== null">
-            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfAiScore') }}</div>
-            <div class="pdf-score-box">
-              <div class="pdf-score-value">{{ analysisResult.aiScore }}%</div>
-              <div class="pdf-score-label" :class="getProbabilityClassForPDF(analysisResult.aiScore)">
-                {{ getProbabilityTextForPDF(analysisResult.aiScore) }}
+          <div class="pdf-body">
+            <!-- 文档名称 -->
+            <div class="pdf-section">
+              <div class="pdf-section-title">{{ $t('aiAnalysis.pdfDocumentName') }}</div>
+              <div class="pdf-document-name">{{ uploadedFile?.name || '-' }}</div>
+            </div>
+
+            <!-- AI生成可能性评分 -->
+            <div class="pdf-section" v-if="analysisResult.aiScore !== undefined && analysisResult.aiScore !== null">
+              <div class="pdf-section-title">{{ $t('aiAnalysis.pdfAiScore') }}</div>
+              <div class="pdf-score-box">
+                <div class="pdf-score-value">{{ analysisResult.aiScore }}%</div>
+                <div class="pdf-score-label" :class="getProbabilityClassForPDF(analysisResult.aiScore)">
+                  {{ getProbabilityTextForPDF(analysisResult.aiScore) }}
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- AI生成痕迹六大维度 -->
-          <div class="pdf-section" v-if="analysisResult.aiDimensions && analysisResult.aiDimensions.length > 0">
-            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfAiDimensionsTitle') }}</div>
-            <div class="pdf-dimensions-list">
-              <div v-for="(dimension, index) in analysisResult.aiDimensions" :key="index" class="pdf-dimension-item">
-                <div class="pdf-dimension-header">
-                  <span class="pdf-dimension-name">{{ dimension.name }}</span>
-                  <span class="pdf-dimension-level" :class="getLevelClass(dimension.level)">
+            <!-- AI生成痕迹六大维度 -->
+            <div class="pdf-section" v-if="analysisResult.aiDimensions && analysisResult.aiDimensions.length > 0">
+              <div class="pdf-section-title">{{ $t('aiAnalysis.pdfAiDimensionsTitle') }}</div>
+              <div class="pdf-dimensions-list">
+                <div v-for="(dimension, index) in analysisResult.aiDimensions" :key="index" class="pdf-dimension-item">
+                  <div class="pdf-dimension-header">
+                    <span class="pdf-dimension-name">{{ dimension.name }}</span>
+                    <span class="pdf-dimension-level" :class="getLevelClass(dimension.level)">
                     {{ formatLevel(dimension.level) }}
                   </span>
+                  </div>
+                  <div class="pdf-dimension-evaluation">{{ dimension.evaluation }}</div>
                 </div>
-                <div class="pdf-dimension-evaluation">{{ dimension.evaluation }}</div>
               </div>
             </div>
-          </div>
 
-          <!-- 文档质量六大维度 -->
-          <div class="pdf-section" v-if="analysisResult.qualityDimensions && analysisResult.qualityDimensions.length > 0">
-            <div class="pdf-section-title">{{ $t('aiAnalysis.pdfQualityDimensionsTitle') }}</div>
-            <div class="pdf-dimensions-list">
-              <div v-for="(dimension, index) in analysisResult.qualityDimensions" :key="index" class="pdf-dimension-item">
-                <div class="pdf-dimension-header">
-                  <span class="pdf-dimension-name">{{ dimension.name }}</span>
-                  <span class="pdf-quality-score" :class="getQualityScoreClass(dimension.score)">
+            <!-- 文档质量六大维度 -->
+            <div class="pdf-section" v-if="analysisResult.qualityDimensions && analysisResult.qualityDimensions.length > 0">
+              <div class="pdf-section-title">{{ $t('aiAnalysis.pdfQualityDimensionsTitle') }}</div>
+              <div class="pdf-dimensions-list">
+                <div v-for="(dimension, index) in analysisResult.qualityDimensions" :key="index" class="pdf-dimension-item">
+                  <div class="pdf-dimension-header">
+                    <span class="pdf-dimension-name">{{ dimension.name }}</span>
+                    <span class="pdf-quality-score" :class="getQualityScoreClass(dimension.score)">
                     {{ dimension.score }}{{ $t('aiAnalysis.pdfScoreUnit') }}
                   </span>
+                  </div>
+                  <div class="pdf-dimension-evaluation">{{ dimension.evaluation }}</div>
                 </div>
-                <div class="pdf-dimension-evaluation">{{ dimension.evaluation }}</div>
+              </div>
+            </div>
+
+            <!-- 修改建议 -->
+            <div class="pdf-section" v-if="analysisResult.recommendations && analysisResult.recommendations.length > 0">
+              <div class="pdf-section-title">{{ $t('aiAnalysis.modificationSuggestions') }}</div>
+              <p class="pdf-desc">{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
+              <div class="pdf-recommendations">
+                <div v-for="(recommendation, index) in analysisResult.recommendations" :key="index" class="pdf-recommendation-item">
+                  <p class="pdf-recommendation-text">{{ index + 1 }}. {{ recommendation }}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- 修改建议 -->
-          <div class="pdf-section" v-if="analysisResult.recommendations && analysisResult.recommendations.length > 0">
-            <div class="pdf-section-title">{{ $t('aiAnalysis.modificationSuggestions') }}</div>
-            <p class="pdf-desc">{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
-            <div class="pdf-recommendations">
-              <div v-for="(recommendation, index) in analysisResult.recommendations" :key="index" class="pdf-recommendation-item">
-                <p class="pdf-recommendation-text">{{ index + 1 }}. {{ recommendation }}</p>
-              </div>
+          <div class="pdf-footer">
+            <p>{{ $t('aiAnalysis.pdfFooter') }}</p>
+          </div>
+        </div>
+
+        <!-- 页面显示内容 -->
+        <div class="recommendations-display">
+          <h2>{{ $t('aiAnalysis.modificationSuggestions') }}</h2>
+          <p>{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
+
+          <div class="recommendations-content">
+            <div class="recommendations-text">
+              <p v-for="(recommendation, index) in analysisResult.recommendations" :key="index">
+                {{ recommendation }}
+              </p>
             </div>
           </div>
-        </div>
 
-        <div class="pdf-footer">
-          <p>{{ $t('aiAnalysis.pdfFooter') }}</p>
-        </div>
-      </div>
-
-      <!-- 页面显示内容 -->
-      <div class="recommendations-display">
-        <h2>{{ $t('aiAnalysis.modificationSuggestions') }}</h2>
-        <p>{{ $t('aiAnalysis.modificationSuggestionsDesc') }}</p>
-
-        <div class="recommendations-content">
-          <div class="recommendations-text">
-            <p v-for="(recommendation, index) in analysisResult.recommendations" :key="index">
-              {{ recommendation }}
-            </p>
+          <div class="button-container">
+            <el-button class="back-btn" @click="goBack">
+              <el-icon><ArrowLeft /></el-icon> {{ $t('common.back') }}
+            </el-button>
+            <el-button class="continue-btn" @click="downloadReport">
+              {{ $t('aiAnalysis.exportPDF') }}
+            </el-button>
           </div>
         </div>
-
-        <div class="button-container">
-          <el-button class="back-btn" @click="goBack">
-            <el-icon><ArrowLeft /></el-icon> {{ $t('common.back') }}
-          </el-button>
-          <el-button class="continue-btn" @click="downloadReport">
-            {{ $t('aiAnalysis.exportPDF') }}
-          </el-button>
-        </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
@@ -751,33 +751,33 @@ const downloadReport = async () => {
     const marginTop = 15 // 上边距（为页眉留空间）
     const marginBottom = 20 // 下边距（为页脚留空间）
     const contentHeight = pageHeight - marginTop - marginBottom // 可用内容高度
-    
+
     // 计算图片尺寸
     const imgWidth = pageWidth
     const imgHeight = (canvas.height * imgWidth) / canvas.width
     const totalPages = Math.ceil(imgHeight / contentHeight)
-    
+
     // 添加页眉页脚函数
     const addHeaderFooter = (pageNum, totalPages) => {
       // 页眉线
       pdf.setDrawColor(200, 200, 200)
       pdf.setLineWidth(0.5)
       pdf.line(10, marginTop - 5, pageWidth - 10, marginTop - 5)
-      
+
       // 页眉文字
       pdf.setFontSize(10)
       pdf.setTextColor(100, 100, 100)
       pdf.text('PaperPurify', 15, marginTop - 2)
-      
+
       // 页码
       const pageText = `${pageNum} / ${totalPages}`
       const pageTextWidth = pdf.getTextWidth(pageText)
       pdf.text(pageText, pageWidth - 15 - pageTextWidth, marginTop - 2)
-      
+
       // 页脚线
       pdf.setDrawColor(200, 200, 200)
       pdf.line(10, pageHeight - marginBottom + 5, pageWidth - 10, pageHeight - marginBottom + 5)
-      
+
       // 页脚文字（只使用英文，避免中文乱码）
       pdf.setFontSize(9)
       pdf.setTextColor(150, 150, 150)
@@ -789,11 +789,11 @@ const downloadReport = async () => {
     // 创建临时canvas用于裁剪每一页
     const tempCanvas = document.createElement('canvas')
     const tempCtx = tempCanvas.getContext('2d')
-    
+
     if (!tempCtx) {
       throw new Error('无法创建临时canvas上下文')
     }
-    
+
     tempCanvas.width = canvas.width
     const pageHeightInPixels = Math.ceil(contentHeight * canvas.width / pageWidth)
     tempCanvas.height = pageHeightInPixels
@@ -803,64 +803,64 @@ const downloadReport = async () => {
       if (pageNum > 1) {
         pdf.addPage()
       }
-      
+
       // 计算当前页要裁剪的内容位置（像素）
       const sourceY = Math.floor((pageNum - 1) * pageHeightInPixels)
       const remainingHeight = canvas.height - sourceY
       const sourceHeight = Math.min(pageHeightInPixels, remainingHeight)
-      
+
       if (sourceHeight <= 0) {
         break // 没有更多内容了
       }
-      
+
       // 调整临时canvas高度以匹配实际内容
       if (sourceHeight < pageHeightInPixels) {
         tempCanvas.height = sourceHeight
       }
-      
+
       // 清空临时canvas
       tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height)
-      
+
       // 设置高质量渲染
       tempCtx.imageSmoothingEnabled = true
       tempCtx.imageSmoothingQuality = 'high'
-      
+
       // 裁剪当前页的内容到临时canvas
       try {
         tempCtx.drawImage(
-          canvas,
-          0, sourceY, canvas.width, sourceHeight,
-          0, 0, canvas.width, sourceHeight
+            canvas,
+            0, sourceY, canvas.width, sourceHeight,
+            0, 0, canvas.width, sourceHeight
         )
       } catch (err) {
         console.error('绘制图片到临时canvas失败:', err)
         throw new Error('图片处理失败: ' + err.message)
       }
-      
+
       // 将裁剪后的内容转换为图片
       const pageImgData = tempCanvas.toDataURL('image/png', 1.0)
       const pageImgHeight = (sourceHeight * imgWidth) / canvas.width
-      
+
       // 添加图片到PDF
       pdf.addImage(
-        pageImgData,
-        'PNG',
-        0,
-        marginTop,
-        imgWidth,
-        pageImgHeight
+          pageImgData,
+          'PNG',
+          0,
+          marginTop,
+          imgWidth,
+          pageImgHeight
       )
-      
+
       // 添加页眉页脚
       addHeaderFooter(pageNum, totalPages)
-      
+
       // 如果不是最后一页，添加分页装饰线
       if (pageNum < totalPages) {
         pdf.setDrawColor(220, 220, 220)
         pdf.setLineWidth(0.5)
         pdf.line(25, pageHeight - marginBottom - 3, pageWidth - 25, pageHeight - marginBottom - 3)
       }
-      
+
       // 恢复临时canvas高度
       tempCanvas.height = pageHeightInPixels
     }
@@ -873,7 +873,7 @@ const downloadReport = async () => {
   } catch (error) {
     console.error('PDF导出错误:', error)
     ElMessage.error(t('aiAnalysis.pdfExportError') + ': ' + error.message)
-    
+
     // 确保隐藏PDF内容区域
     if (pdfContent.value) {
       pdfContent.value.style.display = 'none'
@@ -890,13 +890,13 @@ const downloadReport = async () => {
 // 退出登录
 const handleLogout = () => {
   ElMessageBox.confirm(
-    t('login.logoutConfirm'),  // 修改：使用新的翻译键
-    t('login.logoutTitle'),  // 修改：使用新的翻译键
-    {
-      confirmButtonText: t('common.confirm'),  // 修改：确认按钮文本
-      cancelButtonText: t('common.cancel'),
-      type: 'warning'
-    }
+      t('login.logoutConfirm'),  // 修改：使用新的翻译键
+      t('login.logoutTitle'),  // 修改：使用新的翻译键
+      {
+        confirmButtonText: t('common.confirm'),  // 修改：确认按钮文本
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
   ).then(() => {
     userStore.logOut().then(() => {
       location.href = '/'
@@ -984,6 +984,7 @@ const router = useRouter()
   display: flex;
   flex-direction: column;
   font-family: 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden; /* 防止整个容器滚动 */
 }
 
 /* 顶部黑色区域 */
@@ -1034,11 +1035,15 @@ const router = useRouter()
 /* 主内容区域 */
 .main-content {
   flex: 1;
+  min-height: 0; /* 确保flex布局正常工作 */
   background-color: #fff;
   padding: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden; /* 防止水平滚动 */
+  box-sizing: border-box;
 }
 
 .main-content h2 {
@@ -1067,7 +1072,8 @@ const router = useRouter()
 
 /* 上传区域 */
 .upload-area {
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   height: 240px;
   border: 2px dashed #d9d9d9;
   border-radius: 8px;
@@ -1077,6 +1083,7 @@ const router = useRouter()
   cursor: pointer;
   margin-bottom: 40px;
   transition: border-color 0.3s;
+  box-sizing: border-box;
 }
 
 .upload-area:hover {
@@ -1104,12 +1111,14 @@ const router = useRouter()
 
 /* 文件预览区域 */
 .file-preview {
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   height: 240px;
   margin-bottom: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .file-card {
@@ -1199,7 +1208,8 @@ const router = useRouter()
 
 /* 分析中区域 */
 .analyzing-area {
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   height: 240px;
   border-radius: 8px;
   background-color: #f5f5f5;
@@ -1207,6 +1217,7 @@ const router = useRouter()
   justify-content: center;
   align-items: center;
   margin-bottom: 40px;
+  box-sizing: border-box;
 }
 
 .loading-indicator {
@@ -1232,6 +1243,12 @@ const router = useRouter()
 }
 
 /* 结果区域 - 页面1: AI生成可能性 */
+.result-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .result-content {
   width: 100%;
   max-width: 1200px;
@@ -1239,6 +1256,7 @@ const router = useRouter()
   margin-bottom: 40px;
   gap: 40px;
   flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 .ai-probability {
@@ -1293,10 +1311,12 @@ const router = useRouter()
 
 .dimension-scores {
   flex: 1;
-  min-width: 500px;
+  min-width: 0; /* 允许flex收缩 */
+  max-width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+  box-sizing: border-box;
 }
 
 /* 响应式布局：小屏幕时改为单列 */
@@ -1305,7 +1325,7 @@ const router = useRouter()
     flex-direction: column;
     align-items: center;
   }
-  
+
   .dimension-scores {
     width: 100%;
     max-width: 800px;
@@ -1326,6 +1346,9 @@ const router = useRouter()
   padding: 16px;
   background-color: #f9f9f9;
   width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .dimension-header {
@@ -1333,11 +1356,17 @@ const router = useRouter()
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  gap: 10px;
+  min-width: 0; /* 允许flex收缩 */
 }
 
 .dimension h4 {
   font-size: 16px;
   margin: 0 0 8px 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  flex: 1;
+  min-width: 0; /* 允许flex收缩 */
 }
 
 .score-level {
@@ -1370,12 +1399,16 @@ const router = useRouter()
   font-size: 14px;
   margin: 0;
   line-height: 1.6;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 /* 结果区域 - 页面2: 详细评价 */
 .dimensions-section {
   width: 100%;
+  max-width: 100%;
   padding: 20px 20px;
+  box-sizing: border-box;
 }
 
 .dimensions-section h2 {
@@ -1394,14 +1427,18 @@ const router = useRouter()
 
 .radar-chart-container {
   width: 100%;
+  max-width: 100%;
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
 .radar-chart {
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   height: 320px;
+  box-sizing: border-box;
 }
 
 .quality-dimensions {
@@ -1409,17 +1446,25 @@ const router = useRouter()
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .quality-dimension {
   border: 1px solid #e8e8e8;
   border-radius: 8px;
   padding: 12px;
   background-color: #f9f9f9;
+  box-sizing: border-box;
+  overflow-wrap: break-word; /* 防止文本溢出 */
+  word-wrap: break-word;
 }
 
 .quality-dimension h4 {
   font-size: 14px;
   margin: 0 0 6px 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 .score-value {
   display: block;
@@ -1432,13 +1477,16 @@ const router = useRouter()
   font-size: 12px;
   margin: 6px 0 0 0;
   line-height: 1.5;
+  overflow-wrap: break-word; /* 防止文本溢出 */
+  word-wrap: break-word;
 }
 
 /* 结果区域 - 页面3: 修改建议 */
 .recommendations-section {
-  width: 900px;
-  max-width: 90%;
+  width: 100%;
+  max-width: 900px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .recommendations-section h2 {
@@ -1478,7 +1526,11 @@ const router = useRouter()
   min-height: 600px;
   max-height: 600px;
   overflow-y: auto;
+  overflow-x: hidden; /* 防止水平滚动 */
   line-height: 1.8;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .recommendations-text p {
@@ -1486,6 +1538,8 @@ const router = useRouter()
   line-height: 1.8;
   margin: 0 0 15px 0;
   text-align: justify;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .recommendations-text p:last-child {
