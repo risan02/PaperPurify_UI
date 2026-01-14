@@ -984,6 +984,7 @@ const router = useRouter()
   display: flex;
   flex-direction: column;
   font-family: 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden; /* 防止整个容器滚动 */
 }
 
 /* 顶部黑色区域 */
@@ -1034,11 +1035,15 @@ const router = useRouter()
 /* 主内容区域 */
 .main-content {
   flex: 1;
+  min-height: 0; /* 确保flex布局正常工作 */
   background-color: #fff;
   padding: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden; /* 防止水平滚动 */
+  box-sizing: border-box;
 }
 
 .main-content h2 {
@@ -1067,7 +1072,8 @@ const router = useRouter()
 
 /* 上传区域 */
 .upload-area {
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   height: 240px;
   border: 2px dashed #d9d9d9;
   border-radius: 8px;
@@ -1077,6 +1083,7 @@ const router = useRouter()
   cursor: pointer;
   margin-bottom: 40px;
   transition: border-color 0.3s;
+  box-sizing: border-box;
 }
 
 .upload-area:hover {
@@ -1104,12 +1111,14 @@ const router = useRouter()
 
 /* 文件预览区域 */
 .file-preview {
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   height: 240px;
   margin-bottom: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .file-card {
@@ -1199,7 +1208,8 @@ const router = useRouter()
 
 /* 分析中区域 */
 .analyzing-area {
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   height: 240px;
   border-radius: 8px;
   background-color: #f5f5f5;
@@ -1207,6 +1217,7 @@ const router = useRouter()
   justify-content: center;
   align-items: center;
   margin-bottom: 40px;
+  box-sizing: border-box;
 }
 
 .loading-indicator {
@@ -1232,6 +1243,12 @@ const router = useRouter()
 }
 
 /* 结果区域 - 页面1: AI生成可能性 */
+.result-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .result-content {
   width: 100%;
   max-width: 1200px;
@@ -1239,6 +1256,7 @@ const router = useRouter()
   margin-bottom: 40px;
   gap: 40px;
   flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 .ai-probability {
@@ -1293,10 +1311,12 @@ const router = useRouter()
 
 .dimension-scores {
   flex: 1;
-  min-width: 500px;
+  min-width: 0; /* 允许flex收缩 */
+  max-width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+  box-sizing: border-box;
 }
 
 /* 响应式布局：小屏幕时改为单列 */
@@ -1326,6 +1346,9 @@ const router = useRouter()
   padding: 16px;
   background-color: #f9f9f9;
   width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .dimension-header {
@@ -1333,11 +1356,17 @@ const router = useRouter()
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  gap: 10px;
+  min-width: 0; /* 允许flex收缩 */
 }
 
 .dimension h4 {
   font-size: 16px;
   margin: 0 0 8px 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  flex: 1;
+  min-width: 0; /* 允许flex收缩 */
 }
 
 .score-level {
@@ -1370,12 +1399,16 @@ const router = useRouter()
   font-size: 14px;
   margin: 0;
   line-height: 1.6;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 /* 结果区域 - 页面2: 详细评价 */
 .dimensions-section {
   width: 100%;
+  max-width: 100%;
   padding: 20px 20px;
+  box-sizing: border-box;
 }
 
 .dimensions-section h2 {
@@ -1394,14 +1427,18 @@ const router = useRouter()
 
 .radar-chart-container {
   width: 100%;
+  max-width: 100%;
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
 .radar-chart {
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   height: 320px;
+  box-sizing: border-box;
 }
 
 .quality-dimensions {
@@ -1409,17 +1446,25 @@ const router = useRouter()
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .quality-dimension {
   border: 1px solid #e8e8e8;
   border-radius: 8px;
   padding: 12px;
   background-color: #f9f9f9;
+  box-sizing: border-box;
+  overflow-wrap: break-word; /* 防止文本溢出 */
+  word-wrap: break-word;
 }
 
 .quality-dimension h4 {
   font-size: 14px;
   margin: 0 0 6px 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 .score-value {
   display: block;
@@ -1432,13 +1477,16 @@ const router = useRouter()
   font-size: 12px;
   margin: 6px 0 0 0;
   line-height: 1.5;
+  overflow-wrap: break-word; /* 防止文本溢出 */
+  word-wrap: break-word;
 }
 
 /* 结果区域 - 页面3: 修改建议 */
 .recommendations-section {
-  width: 900px;
-  max-width: 90%;
+  width: 100%;
+  max-width: 900px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .recommendations-section h2 {
@@ -1478,7 +1526,11 @@ const router = useRouter()
   min-height: 600px;
   max-height: 600px;
   overflow-y: auto;
+  overflow-x: hidden; /* 防止水平滚动 */
   line-height: 1.8;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .recommendations-text p {
@@ -1486,6 +1538,8 @@ const router = useRouter()
   line-height: 1.8;
   margin: 0 0 15px 0;
   text-align: justify;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .recommendations-text p:last-child {
